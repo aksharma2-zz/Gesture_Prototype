@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+    <Button
+        android:text="Reset"
+        android:layout_width="119dp"
+        android:layout_height="33dp"
+        android:id="@+id/reset_button"
+
+        />
+
+    <android.gesture.GestureOverlayView
+        android:id="@+id/save_gesture"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gestureStrokeType="multiple"
+        android:fadeEnabled="false"
+        android:fadeOffset="5000">
+
+
+    </android.gesture.GestureOverlayView>   <!--max int value-->
+    <!--android:fadeEnabled="false"-->
+
+</LinearLayout>
