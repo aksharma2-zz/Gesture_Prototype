@@ -18,8 +18,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:gestureStrokeType="multiple"
-        android:fadeEnabled="false"
-        android:fadeOffset="5000">
+        android:gestureStrokeAngleThreshold="90"
+        android:fadeEnabled="true"
+        android:fadeOffset="2000">
 
 
     </android.gesture.GestureOverlayView>   <!--max int value-->

@@ -53,6 +53,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
     private float[] centroid ={};
     private String mGesturename;
     private Button resetButton;
+    private ArrayList<Float>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
     //tc
 
     @Override
@@ -129,7 +130,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         @Override
         public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
             mGestureDrawn = true;
-            Log.d(TAG, "andar");
+            Log.d(TAG, "New Gesture");
         }
 
         @Override
@@ -148,27 +149,31 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                 mCurrentGesture = new Gesture();
                 for (GestureStroke gs : strokes) {
                     float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
-                    Log.d(" points"," is"+ newPoints[0]);
-                    Log.d(" points"," is"+ gestureView.getWidth());
                     translate(newPoints,gestureView.getWidth(),gestureView.getHeight());
-                    Log.d(" points"," is"+ newPoints[0]);
-                    Log.d("number of points"," is"+ newPoints.length);
+                    Log.d("number of points"," is"+ newPoints.length/2);
                     ArrayList<GesturePoint> gp = new ArrayList<>();
+
+
+                    //ReCreating gesturepoints  with sampled points
                     for (int k = 0; k < newPoints.length; k = k + 2) {
                         gp.add(new GesturePoint((newPoints[k]), (newPoints[k + 1]), SystemClock.currentThreadTimeMillis()));
+                        allGesturePoints.add(newPoints[0]);
+                        allGesturePoints.add(newPoints[1]);
                     }
+
                     gs = new GestureStroke(gp); // same gesture but sampled to 5 pairs of points
-                    for (float f : gs.points) {
-                        Log.d("point ", "is " + f);
+                    for (GesturePoint g : gp) {
+                        Log.d("point is x ", Float.toString(g.x) + " y: " + Float.toString(g.y));
                     }
                    // Log.d("length ", "is " + Math.sqrt(Math.pow(newPoints[0]-newPoints[2]),2));
                     Log.d("length", "is " + (newPoints[4] - newPoints[2]));
                     mCurrentGesture.addStroke(gs);
 
                     centroid = computeCentroid(gs.points);
-                    //Log.d("centroid "," is "+centroid[0]+" "+centroid[1]);
+
+                    Log.d("centroid "," is "+centroid[0]+" "+centroid[1]);
                 }
-                centroid = computeCentroid(centroid); // Centroid of entire gesture
+                centroid = computeCentroid(allGesturePoints); // Centroid of entire gesture
                 Log.d("centroid "," is "+centroid[0]+" "+centroid[1]);
                 Log.d("Gesture length ","is "+ mCurrentGesture.getLength());
 
@@ -204,6 +209,22 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
             centerX += points[i];
             i++;
             centerY += points[i];
+        }
+        float[] center = new float[2];
+        center[0] = 2 * centerX / count;
+        center[1] = 2 * centerY / count;
+        return center;
+    }
+
+    static float[] computeCentroid(ArrayList<Float> points) {
+        float centerX = 0;
+        float centerY = 0;
+        int count = points.size();
+
+        for (int i = 0; i < count; i++) {
+            centerX += points.get(i);
+            i++;
+            centerY += points.get(i);
         }
         float[] center = new float[2];
         center[0] = 2 * centerX / count;
