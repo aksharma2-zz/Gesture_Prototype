@@ -53,7 +53,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
     private float[] centroid ={};
     private String mGesturename;
     private Button resetButton;
-    private ArrayList<Float>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
+    private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
     //tc
 
     @Override
@@ -131,6 +131,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
             mGestureDrawn = true;
             Log.d(TAG, "New Gesture");
+            allGesturePoints.clear(); // remove all existing gesture points
         }
 
         @Override
@@ -156,9 +157,11 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
 
                     //ReCreating gesturepoints  with sampled points
                     for (int k = 0; k < newPoints.length; k = k + 2) {
-                        gp.add(new GesturePoint((newPoints[k]), (newPoints[k + 1]), SystemClock.currentThreadTimeMillis()));
-                        allGesturePoints.add(newPoints[0]);
-                        allGesturePoints.add(newPoints[1]);
+                        GesturePoint gestPoint = new GesturePoint((newPoints[k]), (newPoints[k + 1]), SystemClock.currentThreadTimeMillis());
+                        gp.add(gestPoint);
+                        allGesturePoints.add(gestPoint);
+                        //allGesturePoints.add(newPoints[k]);
+                        //allGesturePoints.add(newPoints[k+1]);
                     }
 
                     gs = new GestureStroke(gp); // same gesture but sampled to 5 pairs of points
@@ -201,6 +204,9 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         }
     };
 
+
+    // *** Helper methods underneath ***
+
     static float[] computeCentroid(float[] points) {
         float centerX = 0;
         float centerY = 0;
@@ -235,6 +241,24 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
     static void translateCentroid(float[] centroid, float widthCenter, float heightCenter){
         centroid[0]+=widthCenter-centroid[0];
         centroid[1]+=heightCenter-centroid[1];
+    }
+
+    // return all translated gesture points GP
+    static ArrayList<GesturePoint> translatePoints(float[]centroid, ArrayList<GesturePoint> gesture_points){
+        ArrayList<GesturePoint>points = new ArrayList<>();
+        for(GesturePoint gp:gesture_points){
+            float x=0,y=0;
+            x = centroid[0] - gp.x;
+            y = centroid[1] - gp.y;
+            GesturePoint gesturePoint = new GesturePoint(x,y,SystemClock.currentThreadTimeMillis());
+            points.add(gesturePoint);
+        }
+        return points;
+    }
+
+    //creates one stroke from all translate gesture points
+    static GestureStroke makeStroke(ArrayList<GesturePoint>gp){
+        return new GestureStroke(gp);
     }
 
     static float[] translate(float[] points, float dx, float dy) {
