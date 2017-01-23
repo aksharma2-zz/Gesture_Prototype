@@ -54,24 +54,20 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
     private String mGesturename;
     private Button resetButton;
     private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
-    //tc
+    private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated Gesture points
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
+        Log.d("New ","app ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.save_gesture);
         resetButton = (Button) findViewById(R.id.reset_button);
         Log.d(TAG, "path = " + Environment.getExternalStorageDirectory().getAbsolutePath());
-
-
         gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
         gLib.load();
-
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.save_gesture);
         gestures.addOnGestureListener(mGestureListener);
         gestures.addOnGesturePerformedListener(onGesturePerformedListener);
-
         resetEverything();
         resetButton.setOnClickListener(
                 new View.OnClickListener() {
@@ -81,7 +77,6 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                     }
                 }
         );
-
     }
 
     @Override
@@ -121,14 +116,10 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         return super.onOptionsItemSelected(item);
     }
 
-
-
-    /**
-     * our gesture listener
-     */
     private GestureOverlayView.OnGestureListener mGestureListener = new GestureOverlayView.OnGestureListener() {
         @Override
         public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
+            overlay.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
             mGestureDrawn = true;
             Log.d(TAG, "New Gesture");
             allGesturePoints.clear(); // remove all existing gesture points
@@ -141,21 +132,21 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
 
         @Override
         public void onGestureEnded(final GestureOverlayView gestureView, MotionEvent motion) {
-            Log.d(TAG, "bahar");
+            Log.d(TAG, "Gesture stroke ended");
             try {
-
-                Log.d("length ", "is " + mCurrentGesture.getLength());
+                Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
                 ArrayList<GestureStroke> strokes = mCurrentGesture.getStrokes();
+                Log.d("First point"," is"+ strokes.get(0).points[0]);
                 mCurrentGesture = new Gesture();
                 for (GestureStroke gs : strokes) {
                     float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
                     translate(newPoints,gestureView.getWidth(),gestureView.getHeight());
                     Log.d("number of points"," is"+ newPoints.length/2);
                     ArrayList<GesturePoint> gp = new ArrayList<>();
+                    allGesturePoints.clear();
 
-
-                    //ReCreating gesturepoints  with sampled points
+                    //ReCreating gesture points  with sampled points
                     for (int k = 0; k < newPoints.length; k = k + 2) {
                         GesturePoint gestPoint = new GesturePoint((newPoints[k]), (newPoints[k + 1]), SystemClock.currentThreadTimeMillis());
                         gp.add(gestPoint);
@@ -171,15 +162,11 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                    // Log.d("length ", "is " + Math.sqrt(Math.pow(newPoints[0]-newPoints[2]),2));
                     Log.d("length", "is " + (newPoints[4] - newPoints[2]));
                     mCurrentGesture.addStroke(gs);
-
                     centroid = computeCentroid(gs.points);
-
-                    Log.d("centroid "," is "+centroid[0]+" "+centroid[1]);
                 }
-                centroid = computeCentroid(allGesturePoints); // Centroid of entire gesture
+               // centroid = computeCentroid(allGesturePoints); // Centroid of entire gesture
                 Log.d("centroid "," is "+centroid[0]+" "+centroid[1]);
                 Log.d("Gesture length ","is "+ mCurrentGesture.getLength());
-
 
             }catch(Exception e){
                 Log.d("Exception occured ", e.getMessage());
@@ -197,10 +184,14 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
     private GestureOverlayView.OnGesturePerformedListener onGesturePerformedListener = new GestureOverlayView.OnGesturePerformedListener() {
         @Override
         public void onGesturePerformed(GestureOverlayView gestureOverlayView, Gesture gesture) {
+            gestureOverlayView.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
             Log.d("length of gesture ", "is " + mCurrentGesture.getLength());
             Log.d("centroid ", " is " + centroid[0] + " " + centroid[1]);
-            translateCentroid(centroid, gestureOverlayView.getWidth()/2,gestureOverlayView.getHeight()/2);
+            //translateCentroid(centroid, gestureOverlayView.getWidth()/2,gestureOverlayView.getHeight()/2);
+            translateCentroid(centroid, gestureOverlayView);
+            translatedPoints=translatePoints(centroid,allGesturePoints);
             Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
+            Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
         }
     };
 
@@ -222,15 +213,14 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         return center;
     }
 
-    static float[] computeCentroid(ArrayList<Float> points) {
+    static float[] computeCentroid(ArrayList<GesturePoint> points) {
         float centerX = 0;
         float centerY = 0;
         int count = points.size();
 
         for (int i = 0; i < count; i++) {
-            centerX += points.get(i);
-            i++;
-            centerY += points.get(i);
+            centerX += points.get(i).x;
+            centerY += points.get(i).y;
         }
         float[] center = new float[2];
         center[0] = 2 * centerX / count;
@@ -238,22 +228,24 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         return center;
     }
 
-    static void translateCentroid(float[] centroid, float widthCenter, float heightCenter){
-        centroid[0]+=widthCenter-centroid[0];
-        centroid[1]+=heightCenter-centroid[1];
+    static void translateCentroid(float[] centroid, View v){
+       // centroid[0]+=centreX-centroid[0];
+        centroid[0]=v.getX()+v.getWidth()/2;
+        centroid[1]=v.getY()+v.getHeight()/2;
     }
 
     // return all translated gesture points GP
     static ArrayList<GesturePoint> translatePoints(float[]centroid, ArrayList<GesturePoint> gesture_points){
-        ArrayList<GesturePoint>points = new ArrayList<>();
+        ArrayList<GesturePoint>newPoints = new ArrayList<>();
         for(GesturePoint gp:gesture_points){
             float x=0,y=0;
             x = centroid[0] - gp.x;
             y = centroid[1] - gp.y;
             GesturePoint gesturePoint = new GesturePoint(x,y,SystemClock.currentThreadTimeMillis());
-            points.add(gesturePoint);
+            newPoints.add(gesturePoint);
         }
-        return points;
+     //   newPoints = points;
+        return newPoints;
     }
 
     //creates one stroke from all translate gesture points
