@@ -139,8 +139,14 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                 ArrayList<GestureStroke> strokes = mCurrentGesture.getStrokes();
                 Log.d("First point"," is"+ strokes.get(0).points[0]);
                 mCurrentGesture = new Gesture();
+
                 for (GestureStroke gs : strokes) {
-                    float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
+                    float[] newPoints = spatialSampling(gs,5);
+                   // Log.d("Last point"," is"+ newPoints[-1]);
+                   // Log.d("Last point"," is"+ gs.points[-1]);
+                   // Log.d("second Last point"," is"+ newPoints[-2]);
+                   // Log.d("second Last point"," is"+ gs.points[-2]);
+                   // float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
                     translate(newPoints,gestureView.getWidth(),gestureView.getHeight());
                     Log.d("number of points"," is"+ newPoints.length/2);
                     ArrayList<GesturePoint> gp = new ArrayList<>();
@@ -268,6 +274,61 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
             length+=points[i]-points[i-1];
         }
         return length/points.length;
+    }
+
+    static float[] spatialSampling(GestureStroke gs, int points){
+        float[] newPoints = {0};
+        float equiLength = gs.length/points;
+        for(int i=0;i<points;i++){
+            newPoints[i]=(i+1) * equiLength;
+        }
+        return newPoints;
+    }
+
+    public static ArrayList <GesturePoint> resample(GesturePoint[] pts, int n){
+        float incrementLength = pathLength(pts)/(n-1);
+        float Dist=0;
+        ArrayList<GesturePoint> newPoints = new ArrayList<>();
+        for(int i=1; i<pts.length;i++){
+            double d= euclidDistance(pts[i],pts[i-1]);
+            if((Dist + d)>= incrementLength){
+                float newX =(float) (pts[i-1].x + ((incrementLength - Dist) / d) * (pts[i].x - pts[i-1].x));
+                float newY =(float) (pts[i-1].y + ((incrementLength - Dist) / d) * (pts[i].y - pts[i-1].y));
+                GesturePoint newPoint = new GesturePoint(newX,newY,SystemClock.currentThreadTimeMillis());
+                newPoints.add(newPoint);
+                pts[i] = newPoint;
+            }
+            else{
+                Dist += d;
+            }
+        }
+        return newPoints;
+    }
+
+    public static GesturePoint[] newPoints(GesturePoint[] pts, int n){
+        GesturePoint[] newPoints = new GesturePoint[n];
+        newPoints[0] = pts[0];
+        double xIncDist = (pts[pts.length-1].x - pts[0].x)/(n-1);//euclidDistance(pts[pts.length-1],pts[0]);
+        double yIncDist = (pts[pts.length-1].y - pts[0].y)/(n-1);
+        for(int i=1;i<pts.length-2;i++){
+            float x = (float)(newPoints[i-1].x + xIncDist);
+            float y = (float)(newPoints[i-1].y + yIncDist);
+            newPoints[i] = new GesturePoint(x,y,SystemClock.currentThreadTimeMillis());
+        }
+        newPoints[n-1] = pts[pts.length-1];
+        return newPoints;
+    }
+
+    public static double euclidDistance(GesturePoint pt1, GesturePoint pt2){
+        return Math.sqrt(Math.pow(pt2.x - pt1.x,2) + Math.pow(pt2.y - pt1.y,2));
+    }
+
+    public static float pathLength(GesturePoint[] points){
+        float length=0;
+        for(int i=1;i<points.length;i++){
+            length += Math.sqrt(Math.pow(points[i].x - points[i-1].x,2) + Math.pow(points[i].y - points[i-1].y,2));
+        }
+        return length;
     }
 
     private void getName() {
