@@ -142,12 +142,17 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
 
                 for (GestureStroke gs : strokes) {
                     float[] newPoints = spatialSampling(gs,5);
+                    //convert float[] points of stroke to GesturePoint array
+                    GesturePoint[] gps = floatToGP(gs.points);
+                    //Spatially sample GesturePoints
+                    gps = spatialSample(gps,5);
                    // Log.d("Last point"," is"+ newPoints[-1]);
                    // Log.d("Last point"," is"+ gs.points[-1]);
                    // Log.d("second Last point"," is"+ newPoints[-2]);
                    // Log.d("second Last point"," is"+ gs.points[-2]);
+                    
                    // float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
-                    translate(newPoints,gestureView.getWidth(),gestureView.getHeight());
+                    translated(gps,gestureView.getWidth(),gestureView.getHeight());
                     Log.d("number of points"," is"+ newPoints.length/2);
                     ArrayList<GesturePoint> gp = new ArrayList<>();
                     allGesturePoints.clear();
@@ -259,6 +264,22 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         return new GestureStroke(gp);
     }
 
+    static GesturePoint[] translated(GesturePoint[] points, float dx, float dy) {
+        int size = points.length;
+        ArrayList<GesturePoint> tPoints = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            //points[i].x += dx;
+            float x = points[i].x;
+            x+=dx;
+            //points[i + 1].y += dy;
+            float y = points[i].y;
+            y+=dy;
+            tPoints.add(new GesturePoint(x,y,SystemClock.currentThreadTimeMillis()));
+        }
+        GesturePoint[] translatedPoints = new GesturePoint[tPoints.size()];
+        return tPoints.toArray(translatedPoints);
+    }
+
     static float[] translate(float[] points, float dx, float dy) {
         int size = points.length;
         for (int i = 0; i < size; i += 2) {
@@ -274,6 +295,15 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
             length+=points[i]-points[i-1];
         }
         return length/points.length;
+    }
+
+    //converts array of float to array of Gesture Points
+    static GesturePoint[] floatToGP(float[] points){
+        GesturePoint[] gp = new GesturePoint[(points.length)/2];
+        for(int i=0;i<points.length;i++){
+            gp[i] = new GesturePoint(points[2*i], points[(2*i)+1], SystemClock.currentThreadTimeMillis());
+        }
+        return gp;
     }
 
     static float[] spatialSampling(GestureStroke gs, int points){
@@ -305,7 +335,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         return newPoints;
     }
 
-    public static GesturePoint[] newPoints(GesturePoint[] pts, int n){
+    public static GesturePoint[] spatialSample(GesturePoint[] pts, int n){
         GesturePoint[] newPoints = new GesturePoint[n];
         newPoints[0] = pts[0];
         double xIncDist = (pts[pts.length-1].x - pts[0].x)/(n-1);//euclidDistance(pts[pts.length-1],pts[0]);
