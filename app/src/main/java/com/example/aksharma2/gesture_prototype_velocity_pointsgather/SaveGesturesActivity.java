@@ -136,7 +136,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         @Override
         public void onGestureEnded(final GestureOverlayView gestureView, MotionEvent motion) {
             Log.d(TAG, "Gesture stroke ended");
-           // try {
+            try {
                 gesture_length = mCurrentGesture.getLength();
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
@@ -146,7 +146,6 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                 allGesturePoints.clear();
 
                 for (GestureStroke gs : strokes) {
-                    //float[] newPoints = spatialSampling(gs,5);
                     //convert float[] points of stroke to GesturePoint array
                     GesturePoint[] gps = floatToGP(gs.points);
                     //Spatially sample GesturePoints
@@ -158,14 +157,11 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                     Log.d("spaced point is "," "+gps[1].x);
                     centroid = computeCentroid(new ArrayList<GesturePoint>(Arrays.asList(gps))); // centroid of gesture
                    // float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
-                    gps = translated(gps,centroid, gestureView);
+                    gps = translated(gps,centroid, gestureView); //translates gesture points of gesture to centroid of gesture being translated to center of screen
                     Log.d("number of points"," is"+ gps.length);
                     ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(gps));
 
-                    //ReCreating gesture points  with sampled points
-                    //  for (int k = 0; k < newPoints.length; k = k + 2) {
-                    //    GesturePoint gestPoint = new GesturePoint((newPoints[k]), (newPoints[k + 1]), SystemClock.currentThreadTimeMillis());
-                    //    gp.add(gestPoint);
+                    //add gesture points to allGesturePoints which will be used in OnGesturePerformed
                     for(GesturePoint point: gp) {
                         allGesturePoints.add(point);
                     }
@@ -175,17 +171,16 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                         Log.d("point is x ", Float.toString(g.x) + " y: " + Float.toString(g.y));
                     }
                     mCurrentGesture.addStroke(gs);
-
                 }
-                   // Centroid of entire gesture
-                 // centroid = translateCentroid(centroid, gestureView);
-            //    Log.d("centroid "," is "+centroid[0]+" "+centroid[1]);
+                // Centroid of entire gesture
+                // centroid = translateCentroid(centroid, gestureView);
+                // Log.d("centroid "," is "+centroid[0]+" "+centroid[1]);
                   Log.d("Gesture length ","is "+ mCurrentGesture.getLength());
 
-            //}catch(Exception e){
-            //    Log.d("Exception occured ", e.getMessage());
-            //    reDrawGestureView();
-           // }
+            }catch(Exception e){
+                Log.d("Exception occured ", e.getMessage());
+                reDrawGestureView();
+            }
            // gestureView.draw();
         }
 
@@ -215,21 +210,6 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
 
 
     // *** Helper methods underneath ***
-
-    static float[] computeCentroid(float[] points) {
-        float centerX = 0;
-        float centerY = 0;
-        int count = points.length;
-        for (int i = 0; i < count; i++) {
-            centerX += points[i];
-            i++;
-            centerY += points[i];
-        }
-        float[] center = new float[2];
-        center[0] = 2 * centerX / count;
-        center[1] = 2 * centerY / count;
-        return center;
-    }
 
     static float[] computeCentroid(ArrayList<GesturePoint> points) {
         float centerX = 0;
@@ -441,6 +421,75 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         gestures.removeAllOnGestureListeners();
         gestures.addOnGestureListener(mGestureListener);
         resetEverything();
+    }
+
+    public static ArrayList<GesturePoint> rotate(ArrayList<GesturePoint> points, double radians, float[] centroid) {
+        ArrayList<GesturePoint>newPoints = new ArrayList<GesturePoint>(points.size());
+        //Point c = Centroid(points);
+        float _cos = (float)Math.cos(radians);
+        float _sin =(float)Math.sin(radians);
+        float cx = centroid[0];
+        float cy = centroid[1];
+        for (int i = 0; i < points.size(); i++)
+        {
+            //Point p = (Point) points.elementAt(i);
+
+            float dx = points.get(i).x - cx;
+            float dy = points.get(i).y - cy;
+
+            newPoints.add(
+                    new GesturePoint(
+                            (dx * _cos) - (dy * _sin) + cx, (dx * _sin) + (dy * _cos) + cy, SystemClock.currentThreadTimeMillis()
+                    ));
+
+        }
+        return newPoints;
+    }
+
+    public static ArrayList<GesturePoint> RotateToZero(ArrayList<GesturePoint> points, float[] centroid, Rectangle boundingBox)
+    {
+       // Point c = Centroid(points);
+       // Point first = (Point)points.elementAt(0);
+       // double theta = Trigonometric.atan2(c.Y - first.Y, c.X - first.X);
+        float theta =(float) Math.atan2(centroid[1] - points.get(0).y, centroid[0] - points.get(0).x);
+
+       /* if (centroid != null)
+            centroid.copy(c); */
+
+        if (boundingBox != null)
+            BoundingBox(points, boundingBox);
+
+        return rotate(points, -theta, centroid);
+    }
+
+    public static void BoundingBox(ArrayList<GesturePoint> points, Rectangle dst) {
+        double minX = Double.MAX_VALUE;
+        double maxX = Double.MIN_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxY = Double.MIN_VALUE;
+
+        // Enumeration e = points.elements();
+
+//		foreach (Point p in points)
+        for (GesturePoint gp: points)
+        {
+           // Point p = (Point)e.nextElement();
+
+            if (gp.x < minX)
+                minX = gp.x;
+            if (gp.x > maxX)
+                maxX = gp.x;
+
+            if (gp.y < minY)
+                minY = gp.y;
+            if (gp.y > maxY)
+                maxY = gp.y;
+        }
+
+        dst.X = minX;
+        dst.Y = minY;
+        dst.Width = maxX - minX;
+        dst.Height = maxY - minY;
     }
 
 

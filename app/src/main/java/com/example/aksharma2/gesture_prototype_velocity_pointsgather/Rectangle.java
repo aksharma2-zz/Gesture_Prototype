@@ -1,0 +1,26 @@
+package com.example.aksharma2.gesture_prototype_velocity_pointsgather;
+
+/**
+ * Created by aksharma2 on 29-01-2017.
+ */
+
+public class Rectangle {
+
+    public double X, Y, Width, Height;
+
+    public Rectangle(double x, double y, double width, double height) // constructor
+    {
+        this.X = x;
+        this.Y = y;
+        this.Width = width;
+        this.Height = height;
+    }
+
+    public void copy(Rectangle src)
+    {
+        X = src.X;
+        Y = src.Y;
+        Width = src.Width;
+        Height = src.Height;
+    }
+}
