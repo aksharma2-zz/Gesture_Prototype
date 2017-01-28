@@ -42,6 +42,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 //import pack.GestureApp.R;
 
@@ -141,29 +143,24 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                 mCurrentGesture = new Gesture();
 
                 for (GestureStroke gs : strokes) {
-                    float[] newPoints = spatialSampling(gs,5);
+                    //float[] newPoints = spatialSampling(gs,5);
                     //convert float[] points of stroke to GesturePoint array
                     GesturePoint[] gps = floatToGP(gs.points);
                     //Spatially sample GesturePoints
                     gps = spatialSample(gps,5);
-                   // Log.d("Last point"," is"+ newPoints[-1]);
-                   // Log.d("Last point"," is"+ gs.points[-1]);
-                   // Log.d("second Last point"," is"+ newPoints[-2]);
-                   // Log.d("second Last point"," is"+ gs.points[-2]);
-                    
                    // float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
-                    translated(gps,gestureView.getWidth(),gestureView.getHeight());
-                    Log.d("number of points"," is"+ newPoints.length/2);
-                    ArrayList<GesturePoint> gp = new ArrayList<>();
+                    gps = translated(gps,gestureView.getWidth(),gestureView.getHeight());
+                    Log.d("number of points"," is"+ gps.length);
+                    ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(gps));
+
                     allGesturePoints.clear();
 
                     //ReCreating gesture points  with sampled points
-                    for (int k = 0; k < newPoints.length; k = k + 2) {
-                        GesturePoint gestPoint = new GesturePoint((newPoints[k]), (newPoints[k + 1]), SystemClock.currentThreadTimeMillis());
-                        gp.add(gestPoint);
-                        allGesturePoints.add(gestPoint);
-                        //allGesturePoints.add(newPoints[k]);
-                        //allGesturePoints.add(newPoints[k+1]);
+                    //  for (int k = 0; k < newPoints.length; k = k + 2) {
+                    //    GesturePoint gestPoint = new GesturePoint((newPoints[k]), (newPoints[k + 1]), SystemClock.currentThreadTimeMillis());
+                    //    gp.add(gestPoint);
+                    for(GesturePoint point: gp) {
+                        allGesturePoints.add(point);
                     }
 
                     gs = new GestureStroke(gp); // same gesture but sampled to 5 pairs of points
@@ -171,7 +168,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                         Log.d("point is x ", Float.toString(g.x) + " y: " + Float.toString(g.y));
                     }
                    // Log.d("length ", "is " + Math.sqrt(Math.pow(newPoints[0]-newPoints[2]),2));
-                    Log.d("length", "is " + (newPoints[4] - newPoints[2]));
+                    //Log.d("length", "is " + (newPoints[4] - newPoints[2]));
                     mCurrentGesture.addStroke(gs);
                     centroid = computeCentroid(gs.points);
                 }
