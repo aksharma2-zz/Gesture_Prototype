@@ -8,6 +8,10 @@ public class Rectangle {
 
     public double X, Y, Width, Height;
 
+    public Rectangle(){
+
+    }
+
     public Rectangle(double x, double y, double width, double height) // constructor
     {
         this.X = x;
