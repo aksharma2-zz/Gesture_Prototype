@@ -25,15 +25,15 @@ public class GestureListActivity extends Activity {
     private static ArrayList<GesturePlaceHolder> mGestureList;
     private GestureAdapter gestureAdapter;
     private GestureLibrary gestureLibrary;
-    private Button delButton,renameButton;
+    private Button delButton,renameButton, addButton, testButton;
     //private ImageView mMenuItemView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gestures_list);
-        
-        openOptionsMenu();
+
+      //  openOptionsMenu();
 
         gestureListView = (ListView) findViewById((R.id.gestures_list));
         mGestureList = new ArrayList<GesturePlaceHolder>();
@@ -43,6 +43,8 @@ public class GestureListActivity extends Activity {
         gestureListView.setAdapter(gestureAdapter);
         delButton=(Button)findViewById(R.id.delete_button);
         renameButton=(Button)findViewById(R.id.rename_button);
+       // addButton = (Button) findViewById(R.id.button_gesture_add);
+       // testButton = (Button) findViewById(R.id.button_gesture_test);
 
         // displays the popup context top_menu to either delete or resend measurement
         registerForContextMenu(gestureListView);
@@ -56,7 +58,7 @@ public class GestureListActivity extends Activity {
         setContentView(R.layout.gestures_list);
         Log.d(TAG, getApplicationInfo().dataDir);
 
-        openOptionsMenu();
+       // openOptionsMenu();
 
         gestureListView = (ListView) findViewById((R.id.gestures_list));
         mGestureList = new ArrayList<GesturePlaceHolder>();
@@ -69,9 +71,6 @@ public class GestureListActivity extends Activity {
 
     }
 
-    /**
-     * badha gestures laine emne list ma mukse
-     */
     private void makeList() {
         try {
             mGestureList = new ArrayList<GesturePlaceHolder>();
@@ -91,8 +90,6 @@ public class GestureListActivity extends Activity {
     }
 
     public void populateMenu(View view){
-        //ImageView idView = (ImageView) view.findViewById(R.id.gesture_id);
-        //Log.d(TAG, "ha ha" + idView.getText().toString());
         LinearLayout vwParentRow = (LinearLayout)view.getParent().getParent();
         TextView tv = (TextView)vwParentRow.findViewById(R.id.gesture_name_ref);
         mCurrentGestureName = tv.getText().toString();

@@ -42,6 +42,7 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
             gestureView.gesture_image = (ImageView) convertView.findViewById(R.id.gesture_image);
 
             ImageView dropDownMenu = (ImageView) convertView.findViewById(R.id.menu_item_options);
+
             convertView.setTag(gestureView);
         }
 

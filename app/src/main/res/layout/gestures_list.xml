@@ -6,29 +6,35 @@
 
     <ListView
         android:layout_width="fill_parent"
-        android:layout_height="452dp"
+        android:layout_height="459dp"
         android:divider="@color/colorPrimaryDark"
         android:dividerHeight="1dp"
         android:id="@+id/gestures_list" />
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.22">
+        android:layout_marginBottom="6dp"
+        android:weightSum="1">
 
         <Button
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5"
+            android:layout_marginRight="1dp"
+            android:textSize="15sp"
+            android:textAllCaps="false"
             android:text="ADD"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/gesture_add"
-            android:layout_weight="1" />
-
+            android:onClick="addButtonClick"/>
         <Button
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.48"
+            android:layout_marginLeft="1dp"
             android:text="TEST"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button2"
-            android:layout_weight="1" />
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            android:onClick="testButtonClick"/>
     </LinearLayout>
 </LinearLayout>

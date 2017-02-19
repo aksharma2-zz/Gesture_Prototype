@@ -65,7 +65,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         Log.d("New ","app ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.save_gesture);
-        resetButton = (Button) findViewById(R.id.reset_button);
+        resetButton = (Button) findViewById(R.id.gesture_reset_button);
         Log.d(TAG, "path = " + Environment.getExternalStorageDirectory().getAbsolutePath());
         gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
         gLib.load();
@@ -96,7 +96,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                 reDrawGestureView();
                 break;
             case R.id.Save:
-                reDrawGestureView();
+               openDialog();
                 break;
 
             //TODO : Save gesture as image, dont delete this code
@@ -151,15 +151,16 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                     GesturePoint[] gps = GestureUtility.floatToGP(gs.points);
                     //Spatially sample GesturePoints
                     for(GesturePoint gp:gps){
-                        Log.d("point "," is"+gp.x);
+                        Log.d("x point "," is"+gp.x +" "+ gp.y);
                     }
-                    gps = GestureUtility.spatialSample(gps,10);
+
+                    gps = GestureUtility.spatialSample(gps,5);
                     Log.d("spaced point is "," "+gps[0].x);
                     Log.d("spaced point is "," "+gps[1].x);
                     centroid = GestureUtility.computeCentroid(new ArrayList<GesturePoint>(Arrays.asList(gps))); // centroid of gesture
 
-                   // float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
-                  //  gps = GestureUtility.translated(gps,centroid, gestureView); //translates gesture points of gesture to centroid of gesture being translated to center of screen
+                    // float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
+                    //  gps = GestureUtility.translated(gps,centroid, gestureView); //translates gesture points of gesture to centroid of gesture being translated to center of screen
                     Log.d("number of points"," is"+ gps.length);
                     ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(gps));
 
@@ -178,13 +179,13 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                 // Centroid of entire gesture
                 // centroid = translateCentroid(centroid, gestureView);
                 // Log.d("centroid "," is "+centroid[0]+" "+centroid[1]);
-                  Log.d("Gesture length ","is "+ mCurrentGesture.getLength());
+                Log.d("Gesture length ","is "+ mCurrentGesture.getLength());
 
             }catch(Exception e){
                 Log.d("Exception occured ", e.getMessage());
                 reDrawGestureView();
             }
-           // gestureView.draw();
+            // gestureView.draw();
         }
 
         @Override
@@ -198,23 +199,28 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         public void onGesturePerformed(GestureOverlayView gestureOverlayView, Gesture gesture) {
             gestureOverlayView.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
             centroid = GestureUtility.computeCentroid(allGesturePoints);
+
+            //translate points wrt to centroid
             allGesturePoints = GestureUtility.translated(allGesturePoints,centroid, gestureOverlayView);
+
             Log.d("Centroid of points is ", " "+ centroid[0] + " " + centroid[1]);
             Log.d("performed point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
             Log.d("performed point is", " "+ allGesturePoints.get(0).y); // translated gesture point x
             Log.d("length of gesture ", "is " + gesture_length);
+
+            //rotate the gesture points
             Rectangle r = GestureUtility.BoundingBox(allGesturePoints, new Rectangle());
             allGesturePoints = GestureUtility.RotateToZero(allGesturePoints,centroid, r);
             Log.d("rotated point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
             Log.d("rotated point is", " "+ allGesturePoints.get(0).y);
-      //      Log.d("centroid ", " is " + centroid[0] + " " + centroid[1]);
-            //translateCentroid(centroid, gestureOverlayView.getWidth()/2,gestureOverlayView.getHeight()/2);
+
+            //translate centroid
             centroid = GestureUtility.translateCentroid(centroid, gestureOverlayView);
-          //  translatedPoints=translatePoints(centroid,allGesturePoints);
+            //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
             Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
             Arrays.fill(centroid,0); // make centroid -> 0
-         //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
+            //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
         }
     };
 
@@ -222,9 +228,9 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
     // *** Helper methods underneath ***
 
 
-    private void getName() {
+    private void openDialog() {
         AlertDialog.Builder namePopup = new AlertDialog.Builder(this);
-        namePopup.setTitle("Enter name");
+        namePopup.setTitle("Enter Gesture Name");
         //namePopup.setMessage(R.string.enter_name);
         final EditText nameField = new EditText(this);
         namePopup.setView(nameField);
@@ -236,8 +242,8 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                     mGesturename = nameField.getText().toString();
                     saveGesture();
                 } else {
-                    getName();  //TODO : set name field with old name string user added
-                    showToast("invalid");
+                    openDialog();  //TODO : set name field with old name string user added
+                    showToast("Invalid");
                 }
                 //return;
             }
@@ -279,7 +285,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
 
     private void reDrawGestureView() {
         setContentView(R.layout.save_gesture);
-        resetButton = (Button) findViewById(R.id.reset_button);
+        resetButton = (Button) findViewById(R.id.gesture_reset_button);
         resetButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override

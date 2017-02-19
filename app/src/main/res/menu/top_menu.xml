@@ -6,13 +6,13 @@
         android:id="@+id/Save"
         android:icon="@android:drawable/ic_menu_save"
         android:orderInCategory="100"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="SAVE"/>
     <item
         android:id="@+id/DELETE"
         android:icon="@android:drawable/ic_menu_delete"
         android:orderInCategory="100"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="DELETE"/>
 
 </menu>
