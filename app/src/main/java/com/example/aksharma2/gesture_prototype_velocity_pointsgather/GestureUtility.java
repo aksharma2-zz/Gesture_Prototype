@@ -89,7 +89,7 @@ public class GestureUtility {
         return length/points.length;
     }
 
-    //converts array of float to array of Gesture Points
+    //converts array of float to array of PersonalGesture Points
     static GesturePoint[] floatToGP(float[] points){
         GesturePoint[] gp = new GesturePoint[points.length/2];
         for(int i=0;i<points.length/2;i++){

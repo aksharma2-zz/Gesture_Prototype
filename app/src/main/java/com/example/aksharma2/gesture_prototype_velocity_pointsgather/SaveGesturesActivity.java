@@ -1,6 +1,5 @@
 package com.example.aksharma2.gesture_prototype_velocity_pointsgather;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.gesture.Gesture;
@@ -9,9 +8,6 @@ import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
 import android.gesture.GesturePoint;
 import android.gesture.GestureStroke;
-import android.gesture.GestureUtils;
-import android.graphics.Path;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -21,34 +17,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.gesture.Gesture;
-import android.gesture.GestureLibraries;
-import android.gesture.GestureLibrary;
-import android.gesture.GestureOverlayView;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 //import pack.GestureApp.R;
 
-public class SaveGesturesActivity extends AppCompatActivity implements View.OnClickListener {
+public class SaveGesturesActivity extends AppCompatActivity {
     private GestureLibrary gLib;
     private static final String TAG = "SaveGestureActivity";
     private boolean mGestureDrawn;                      //tc
@@ -57,8 +36,9 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
     private float[] centroid ={};
     private String mGesturename;
     private Button resetButton;
+    private GestureLibrary gesture_lib;
     private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
-    private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated Gesture points
+    private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated PersonalGesture points
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,7 +76,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                 reDrawGestureView();
                 break;
             case R.id.Save:
-               openDialog();
+               openDialog("");
                 break;
 
             //TODO : Save gesture as image, dont delete this code
@@ -125,7 +105,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
             overlay.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
             mGestureDrawn = true;
-            Log.d(TAG, "New Gesture" + SystemClock.elapsedRealtime());
+            Log.d(TAG, "New PersonalGesture" + SystemClock.elapsedRealtime());
             allGesturePoints.clear(); // remove all existing gesture points
         }
 
@@ -136,7 +116,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
 
         @Override
         public void onGestureEnded(final GestureOverlayView gestureView, MotionEvent motion) {
-            Log.d(TAG, "Gesture stroke ended");
+            Log.d(TAG, "PersonalGesture stroke ended");
             try {
                 gesture_length = mCurrentGesture.getLength();
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
@@ -179,7 +159,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                 // Centroid of entire gesture
                 // centroid = translateCentroid(centroid, gestureView);
                 // Log.d("centroid "," is "+centroid[0]+" "+centroid[1]);
-                Log.d("Gesture length ","is "+ mCurrentGesture.getLength());
+                Log.d("PersonalGesture length ","is "+ mCurrentGesture.getLength());
 
             }catch(Exception e){
                 Log.d("Exception occured ", e.getMessage());
@@ -216,6 +196,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
 
             //translate centroid
             centroid = GestureUtility.translateCentroid(centroid, gestureOverlayView);
+            
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
             Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
@@ -228,11 +209,12 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
     // *** Helper methods underneath ***
 
 
-    private void openDialog() {
+    private void openDialog(String name) {
         AlertDialog.Builder namePopup = new AlertDialog.Builder(this);
-        namePopup.setTitle("Enter Gesture Name");
+        namePopup.setTitle("Enter Personal Gesture Name");
         //namePopup.setMessage(R.string.enter_name);
         final EditText nameField = new EditText(this);
+        nameField.setText(name);
         namePopup.setView(nameField);
         namePopup.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
@@ -242,7 +224,7 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
                     mGesturename = nameField.getText().toString();
                     saveGesture();
                 } else {
-                    openDialog();  //TODO : set name field with old name string user added
+                    openDialog("");  //TODO : set name field with old name string user added
                     showToast("Invalid");
                 }
                 //return;
@@ -266,12 +248,16 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
         // if(!mGesturename.matches("")) {
         //gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
         //gLib.load();
-        //TODO: check kar k same naam valu gesture che k nai
+        // todo : add input name back to recreated Dialog Builder
+        if(checkExistingName(mGesturename)){
+            showToast("Gesture name already exists");
+            openDialog(mGesturename);
+        }
         gLib.addGesture(mGesturename, mCurrentGesture);
         if (!gLib.save()) {
             Log.e(TAG, "gesture not saved!");
         }else {
-            showToast("saved" + getExternalFilesDir(null) + "/gesture.txt");
+            showToast("saved" + getExternalFilesDir(null) + mGesturename + "/gesture.txt");
             Log.i(TAG,"gesture saved!");
         }
         reDrawGestureView();
@@ -301,9 +287,16 @@ public class SaveGesturesActivity extends AppCompatActivity implements View.OnCl
     }
 
 
+    private boolean checkExistingName(String name){
 
-    @Override
-    public void onClick(View view) {
-
+        gesture_lib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
+        gesture_lib.load();
+        Set<String> gestureSet = gesture_lib.getGestureEntries();
+        for(String gestureName : gestureSet){
+            if(gestureName.equalsIgnoreCase(name)){
+                return true;
+            }
+        }
+        return false;
     }
 }
