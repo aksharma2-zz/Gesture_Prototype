@@ -32,6 +32,8 @@ public class SaveGesturesActivity extends AppCompatActivity {
     private static final String TAG = "SaveGestureActivity";
     private boolean mGestureDrawn;                      //tc
     private Gesture mCurrentGesture;
+    private GestureStroke finalGestureStroke;
+    private Gesture finalGesture;
     public float gesture_length;
     private float[] centroid ={};
     private String mGesturename;
@@ -189,14 +191,18 @@ public class SaveGesturesActivity extends AppCompatActivity {
             Log.d("length of gesture ", "is " + gesture_length);
 
             //rotate the gesture points
-            Rectangle r = GestureUtility.BoundingBox(allGesturePoints, new Rectangle());
+          /*  Rectangle r = GestureUtility.BoundingBox(allGesturePoints, new Rectangle());
             allGesturePoints = GestureUtility.RotateToZero(allGesturePoints,centroid, r);
             Log.d("rotated point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
-            Log.d("rotated point is", " "+ allGesturePoints.get(0).y);
+            Log.d("rotated point is", " "+ allGesturePoints.get(0).y); */
 
             //translate centroid
             centroid = GestureUtility.translateCentroid(centroid, gestureOverlayView);
-            
+
+            finalGestureStroke = new GestureStroke(allGesturePoints);
+            finalGesture = new Gesture();
+            finalGesture.addStroke(finalGestureStroke);
+
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
             Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
@@ -224,7 +230,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
                     mGesturename = nameField.getText().toString();
                     saveGesture();
                 } else {
-                    openDialog("");  //TODO : set name field with old name string user added
+                    openDialog("");
                     showToast("Invalid");
                 }
                 //return;
@@ -250,14 +256,15 @@ public class SaveGesturesActivity extends AppCompatActivity {
         //gLib.load();
         // todo : add input name back to recreated Dialog Builder
         if(checkExistingName(mGesturename)){
-            showToast("Gesture name already exists");
+            showToast("Gesture with name already exists");
             openDialog(mGesturename);
+            return;
         }
-        gLib.addGesture(mGesturename, mCurrentGesture);
+        gLib.addGesture(mGesturename, finalGesture);
         if (!gLib.save()) {
             Log.e(TAG, "gesture not saved!");
         }else {
-            showToast("saved" + getExternalFilesDir(null) + mGesturename + "/gesture.txt");
+            showToast("saved" + getExternalFilesDir(null) + "/gesture.txt");
             Log.i(TAG,"gesture saved!");
         }
         reDrawGestureView();
