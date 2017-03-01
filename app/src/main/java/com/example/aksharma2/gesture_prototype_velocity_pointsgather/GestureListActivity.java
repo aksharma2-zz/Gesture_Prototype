@@ -91,7 +91,7 @@ public class GestureListActivity extends Activity {
 
     public void populateMenu(View view){
         LinearLayout vwParentRow = (LinearLayout)view.getParent().getParent();
-        TextView tv = (TextView)vwParentRow.findViewById(R.id.gesture_name_ref);
+        TextView tv = (TextView)vwParentRow.findViewById(R.id.gesture_name);
         mCurrentGestureName = tv.getText().toString();
         PopupMenu popup = new PopupMenu(this, view);
         // popup.getMenuInflater().inflate(R.menu.gesture_item_options, popup.getMenu());
@@ -112,6 +112,7 @@ public class GestureListActivity extends Activity {
         gestureLibrary.removeEntry(mCurrentGestureName);
         gestureLibrary.save();
         mCurrentGestureName = "";
+        gestureAdapter.notifyDataSetChanged();
         onResume();
     }
 

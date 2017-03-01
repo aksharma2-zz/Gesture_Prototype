@@ -168,6 +168,41 @@ public class SaveGesturesActivity extends AppCompatActivity {
                 reDrawGestureView();
             }
             // gestureView.draw();
+
+
+
+            centroid = GestureUtility.computeCentroid(allGesturePoints);
+
+            //translate points wrt to centroid
+            allGesturePoints = GestureUtility.translated(allGesturePoints,centroid, gestureView);
+
+            Log.d("Centroid of points is ", " "+ centroid[0] + " " + centroid[1]);
+            Log.d("performed point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
+            Log.d("performed point is", " "+ allGesturePoints.get(0).y); // translated gesture point x
+            Log.d("length of gesture ", "is " + gesture_length);
+
+            //rotate the gesture points
+          /*  Rectangle r = GestureUtility.BoundingBox(allGesturePoints, new Rectangle());
+            allGesturePoints = GestureUtility.RotateToZero(allGesturePoints,centroid, r);
+            Log.d("rotated point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
+            Log.d("rotated point is", " "+ allGesturePoints.get(0).y); */
+
+            //translate centroid
+            centroid = GestureUtility.translateCentroid(centroid, gestureView);
+
+            finalGestureStroke = new GestureStroke(allGesturePoints);
+            finalGesture = new Gesture();
+            finalGesture.addStroke(finalGestureStroke);
+
+            //  translatedPoints=translatePoints(centroid,allGesturePoints);
+            gesture_length = 0;
+            Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
+            Arrays.fill(centroid,0); // make centroid -> 0
+            //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
+
+
+
+
         }
 
         @Override
@@ -261,6 +296,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
             return;
         }
         gLib.addGesture(mGesturename, finalGesture);
+
         if (!gLib.save()) {
             Log.e(TAG, "gesture not saved!");
         }else {

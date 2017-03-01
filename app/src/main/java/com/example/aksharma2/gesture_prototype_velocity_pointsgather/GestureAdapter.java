@@ -23,7 +23,7 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
 
 
     public GestureAdapter(ArrayList<GesturePlaceHolder> gestureList, Context ctx){
-        super(ctx, R.layout.gestures_list);
+        super(ctx, R.layout.gestures_list, gestureList);
         this.gestureList = gestureList;
         this.context = ctx;
     }
@@ -35,14 +35,14 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
         GestureView gestureView = new GestureView();
         if(convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-            layoutInflater.inflate(R.layout.gesture_list_item, null);
+            convertView =  layoutInflater.inflate(R.layout.gesture_list_item, null);
 
             gestureView.gesture_name = (TextView) convertView.findViewById(R.id.gesture_name);
             gestureView.gesture_id = (TextView) convertView.findViewById(R.id.gesture_id);
             gestureView.gesture_image = (ImageView) convertView.findViewById(R.id.gesture_image);
+            gestureView.gestureNameRef = (TextView) convertView.findViewById(R.id.gesture_name_ref);
 
             ImageView dropDownMenu = (ImageView) convertView.findViewById(R.id.menu_item_options);
-
             convertView.setTag(gestureView);
         }
 
@@ -53,7 +53,7 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
         GesturePlaceHolder gesturePlaceHolder = gestureList.get(position);
         gestureView.gesture_name.setText(gesturePlaceHolder.getGestureName());
         gestureView.gesture_id.setText(Long.toString(gesturePlaceHolder.getGesture().getID()));
-        gestureView.gesture_image.setImageBitmap(gesturePlaceHolder.getGesture().toBitmap(30,30,5, Color.RED));
+        gestureView.gesture_image.setImageBitmap(gesturePlaceHolder.getGesture().toBitmap(30,30,3, Color.RED));
 
         return convertView;
         }
