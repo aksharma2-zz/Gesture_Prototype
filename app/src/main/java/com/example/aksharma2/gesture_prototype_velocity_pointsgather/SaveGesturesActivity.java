@@ -120,6 +120,13 @@ public class SaveGesturesActivity extends AppCompatActivity {
         public void onGestureEnded(final GestureOverlayView gestureView, MotionEvent motion) {
             Log.d(TAG, "PersonalGesture stroke ended");
             try {
+
+                if(!GestureUtility.strokeLengthThreshold(gestureView, gestureView.getGesture(), 150)){
+                    showToast("Gesture stroke is too small. Please try again");
+                    reDrawGestureView();
+                    return;
+                }
+
                 gesture_length = mCurrentGesture.getLength();
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
@@ -313,6 +320,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
     }
 
     private void reDrawGestureView() {
+        Log.i("RESET", " GESTURE");
         setContentView(R.layout.save_gesture);
         resetButton = (Button) findViewById(R.id.gesture_reset_button);
         resetButton.setOnClickListener(

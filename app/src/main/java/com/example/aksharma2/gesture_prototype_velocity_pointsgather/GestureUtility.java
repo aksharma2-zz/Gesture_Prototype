@@ -1,5 +1,7 @@
 package com.example.aksharma2.gesture_prototype_velocity_pointsgather;
 
+import android.gesture.Gesture;
+import android.gesture.GestureOverlayView;
 import android.gesture.GesturePoint;
 import android.gesture.GestureStroke;
 import android.os.SystemClock;
@@ -240,6 +242,17 @@ public class GestureUtility {
         dst.Height = maxY - minY;
 
         return dst;
+    }
+
+    public static boolean strokeLengthThreshold(GestureOverlayView overlay, Gesture g, int threshold){
+        g = overlay.getGesture();
+        ArrayList<GestureStroke> strokes = g.getStrokes();
+        for(GestureStroke gs: strokes){
+            if(gs.length < threshold){
+                return false;
+            }
+        }
+        return true;
     }
 
 
