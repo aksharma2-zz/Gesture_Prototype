@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1">
+
+
+    <android.gesture.GestureOverlayView
+        android:id="@+id/save_gesture"
+        android:layout_width="fill_parent"
+        android:layout_height="464dp"
+        android:gestureStrokeType="multiple"
+        android:gestureStrokeAngleThreshold="90"
+        android:fadeEnabled="false"
+        android:fadeOffset="200000">
+
+
+    </android.gesture.GestureOverlayView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:text="TEST"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/gesture_test_button"
+            android:layout_weight="1.50"
+            android:elevation="0dp" />
+
+        <Button
+            android:text="VALUE"
+            android:layout_width="149dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/gesture_value_button"
+
+            android:layout_weight="1" />
+    </LinearLayout>   <!--max int value-->
+    <!--android:fadeEnabled="false"-->
+
+
+</LinearLayout>
