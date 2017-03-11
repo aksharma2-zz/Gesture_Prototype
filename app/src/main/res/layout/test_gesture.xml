@@ -7,7 +7,7 @@
 
 
     <android.gesture.GestureOverlayView
-        android:id="@+id/save_gesture"
+        android:id="@+id/test_gesture"
         android:layout_width="fill_parent"
         android:layout_height="464dp"
         android:gestureStrokeType="multiple"
