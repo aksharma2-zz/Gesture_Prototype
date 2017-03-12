@@ -9,7 +9,10 @@ import android.gesture.GestureStroke;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -22,7 +25,7 @@ import java.util.Arrays;
  * Created by aksharma2 on 17-02-2017.
  */
 
-public class GestureRecognizeActivity extends Activity {
+public class GestureRecognizeActivity extends AppCompatActivity {
 
     Gesture g1 = new Gesture();
     Gesture g2 = new Gesture();
@@ -47,11 +50,11 @@ public class GestureRecognizeActivity extends Activity {
 
    static GesturePoint x = new GesturePoint(540,690,SystemClock.currentThreadTimeMillis());
 
-    GesturePoint p1 = new GesturePoint(50,50, SystemClock.currentThreadTimeMillis());
-    GesturePoint p2 = new GesturePoint(70,70, SystemClock.currentThreadTimeMillis());
-    GesturePoint p3 = new GesturePoint(90,90, SystemClock.currentThreadTimeMillis());
-    GesturePoint p4 = new GesturePoint(110,110, SystemClock.currentThreadTimeMillis());
-    GesturePoint p5 = new GesturePoint(130,130, SystemClock.currentThreadTimeMillis());
+    GesturePoint p1 = new GesturePoint(220,60, SystemClock.currentThreadTimeMillis());
+    GesturePoint p2 = new GesturePoint(300,60, SystemClock.currentThreadTimeMillis());
+    GesturePoint p3 = new GesturePoint(380,60, SystemClock.currentThreadTimeMillis());
+    GesturePoint p4 = new GesturePoint(580,60, SystemClock.currentThreadTimeMillis());
+    GesturePoint p5 = new GesturePoint(900,60, SystemClock.currentThreadTimeMillis());
 
 
     GesturePoint q1 = new GesturePoint(60,60, SystemClock.currentThreadTimeMillis());
@@ -100,8 +103,9 @@ public class GestureRecognizeActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Log.i("Length is", ":" +dist);
+                showToast("difference: "+dist);
                 //Toast.makeText(GestureRecognizeActivity.this, ""+dist, Toast.LENGTH_SHORT).show();
-                if(dist<70)
+                if(dist<500)
                     Toast.makeText(GestureRecognizeActivity.this, "Gesture recognized", Toast.LENGTH_SHORT).show();
 
             }
@@ -111,6 +115,29 @@ public class GestureRecognizeActivity extends Activity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.top_menu_test, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.gesture_test:
+                Log.i("Gesture"," Difference: "+dist);
+                showToast("Difference: "+dist);
+                break;
+
+            case R.id.gesture_remove:
+                Log.i("Gesture", "Gesture Reset");
+                reDrawGestureView();
+                break;
+
+            default: return false;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private GestureOverlayView.OnGestureListener mGestureListener = new GestureOverlayView.OnGestureListener() {
         @Override
@@ -244,9 +271,9 @@ public class GestureRecognizeActivity extends Activity {
        // GestureStroke gs2 = g2.getStrokes().get(0);
 
         for(int i=0;i<5;i++){
-            diff1 = euclidDistance(gp1.get(i),x);
-            diff2 = euclidDistance(gps[i],x);
-            diff += Math.abs(diff2 - diff1);
+            diff1 = euclidDistance(gp1.get(i),gps[i]);
+            //diff2 = euclidDistance(gps[i],x);
+            diff += Math.abs(diff1); // diff += Math.abs(diff2 - diff1);
         }
         return diff;
     }
@@ -260,9 +287,10 @@ public class GestureRecognizeActivity extends Activity {
     }
 
     private void reDrawGestureView() {
-        Log.i("RESET", " GESTURE");
-        setContentView(R.layout.save_gesture);
-        resetButton = (Button) findViewById(R.id.gesture_reset_button);
+        dist=0;
+        Log.i("Action", "RESET GESTURE");
+        setContentView(R.layout.test_gesture);
+        resetButton = (Button) findViewById(R.id.gesture_test_button);
         resetButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -271,7 +299,7 @@ public class GestureRecognizeActivity extends Activity {
                     }
                 }
         );
-        GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.save_gesture);
+        GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.test_gesture);
         gestures.removeAllOnGestureListeners();
         gestures.addOnGestureListener(mGestureListener);
         resetEverything();
