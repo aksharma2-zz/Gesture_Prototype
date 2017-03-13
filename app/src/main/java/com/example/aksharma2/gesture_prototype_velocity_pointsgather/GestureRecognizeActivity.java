@@ -34,6 +34,7 @@ import java.util.Set;
 public class GestureRecognizeActivity extends AppCompatActivity {
 
     Gesture g1 = new Gesture();
+    Gesture testGesture = new Gesture();
     Gesture g2 = new Gesture();
     private GestureLibrary gLib;
     private static final String TAG = "SaveGestureActivity";
@@ -43,11 +44,12 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     private Gesture finalGesture;
     public float gesture_length;
     private float[] centroid ={};
+    static GesturePoint[] points;
     private String mGesturename;
     private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
     private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated PersonalGesture points
     static GesturePoint[] gps;
-     double dist=0;
+    double dist=0;
 
     static ArrayList<GesturePoint> gp1 = new ArrayList<>();
     static ArrayList<GesturePoint> gp2 = new ArrayList<>();
@@ -250,7 +252,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
 
 
-            dist = euclidDistance();
+            dist = euclidDistance(testGesture);
 
         }
 
@@ -268,15 +270,21 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         return Math.sqrt(Math.pow(pt2.x - pt1.x,2) + Math.pow(pt2.y - pt1.y,2));
     }
 
-    public static double euclidDistance(){
+    public static double euclidDistance(Gesture testGesture){
         double diff=0;
         double diff1=0;
         double diff2=0;
+        GestureStroke gs = testGesture.getStrokes().get(0);
+        points = GestureUtility.floatToGP(gs.points);
+
+        for(int i=0;i<points.length;i++){
+            Log.i("Loaded points ","x "+points[i].x + " y "+points[i].y);
+        }
       //  GestureStroke gs1 = g1.getStrokes().get(0);
        // GestureStroke gs2 = g2.getStrokes().get(0);
 
         for(int i=0;i<5;i++){
-            diff1 = euclidDistance(gp1.get(i),gps[i]);
+            diff1 = euclidDistance(points[i], gps[i]);
             //diff2 = euclidDistance(gps[i],x);
             diff += Math.abs(diff1); // diff += Math.abs(diff2 - diff1);
         }
@@ -315,11 +323,11 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     }
 
     public void openDialog(){
-        final Gesture g=null;
         final EditText ed = new EditText(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Input gesture name to load");
         builder.setView(ed);
+        builder.setCancelable(false);
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
@@ -343,10 +351,19 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
                 gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
                 gLib.load();
-                
+
                 try {
-                    Gesture g = gLib.getGestures(text).get(0);
-                } catch (NullPointerException npe){
+                    Set<String> gestureSet = gLib.getGestureEntries();
+                    for (String gName : gestureSet) {
+                        ArrayList<Gesture> list = gLib.getGestures(text);
+                        for (Gesture g : list) {
+                            Log.i("Gesture ", "" + g.getStrokesCount());
+                        }
+                        testGesture=list.get(0);
+
+                        //   testGesture = gLib.getGestures(text).get(0);
+                    }
+                }catch (NullPointerException npe){
 
                     Log.e("Gesture:", " Doesn't exist");
                     showToast("Gesture with name does not exist");
@@ -356,5 +373,18 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             }
         });
         builder.show();
+        Log.i("Stroke count: ",""+testGesture.getStrokesCount());
+       // testGesture.
+
     }
+
+    void showGestureSpecs() {
+        GestureStroke gs = testGesture.getStrokes().get(0);
+        GesturePoint[] gp = GestureUtility.floatToGP(gs.points);
+
+        for (int i = 0; i < gp.length; i++) {
+            Log.i("Points", " X " + gp[0].x + " Y " + gp[0].y);
+        }
+    }
+
 }
