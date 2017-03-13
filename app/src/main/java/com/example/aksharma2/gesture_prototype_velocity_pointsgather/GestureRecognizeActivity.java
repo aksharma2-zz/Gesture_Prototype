@@ -1,7 +1,10 @@
 package com.example.aksharma2.gesture_prototype_velocity_pointsgather;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
 import android.gesture.GesturePoint;
@@ -9,6 +12,7 @@ import android.gesture.GestureStroke;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -16,10 +20,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * Created by aksharma2 on 17-02-2017.
@@ -38,7 +44,6 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     public float gesture_length;
     private float[] centroid ={};
     private String mGesturename;
-    private GestureLibrary gesture_lib;
     private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
     private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated PersonalGesture points
     static GesturePoint[] gps;
@@ -71,7 +76,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_gesture);
         resetButton = (Button)findViewById(R.id.gesture_test_button);
-
+        openDialog();
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.test_gesture);
         gestures.addOnGestureListener(mGestureListener);
       //  gestures.addOnGesturePerformedListener(onGesturePerformedListener);
@@ -307,5 +312,49 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
     private void showToast(String string){
         Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
+    }
+
+    public void openDialog(){
+        final Gesture g=null;
+        final EditText ed = new EditText(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Input gesture name to load");
+        builder.setView(ed);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                Intent intent = new Intent(GestureRecognizeActivity.this, GestureListActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                boolean gesture_found = false;
+                String text;
+                text = ed.getText().toString();
+
+                if(text.matches("")){
+                    Log.e("Gesture:", " Invalid name");
+                    showToast("Please enter gesture name");
+                    openDialog();
+                }
+
+                gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
+                gLib.load();
+                
+                try {
+                    Gesture g = gLib.getGestures(text).get(0);
+                } catch (NullPointerException npe){
+
+                    Log.e("Gesture:", " Doesn't exist");
+                    showToast("Gesture with name does not exist");
+                    openDialog();
+                }
+
+            }
+        });
+        builder.show();
     }
 }
