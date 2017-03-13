@@ -109,6 +109,7 @@ public class GestureListActivity extends Activity {
     }
 
     public void deleteButtonClick(View v){
+        Log.i("Click"," Delete Gesture");
         gestureLibrary.removeEntry(mCurrentGestureName);
         gestureLibrary.save();
         mCurrentGestureName = "";

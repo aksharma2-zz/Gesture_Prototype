@@ -30,7 +30,7 @@ import java.util.Set;
 public class SaveGesturesActivity extends AppCompatActivity {
     private GestureLibrary gLib;
     private static final String TAG = "SaveGestureActivity";
-    private boolean mGestureDrawn;                      //tc
+    private boolean gestureExists;                      //tc
     private Gesture mCurrentGesture;
     private GestureStroke finalGestureStroke;
     private Gesture finalGesture;
@@ -106,7 +106,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
         @Override
         public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
             overlay.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
-            mGestureDrawn = true;
+            gestureExists = true;
             Log.d(TAG, "New PersonalGesture" + SystemClock.elapsedRealtime());
             allGesturePoints.clear(); // remove all existing gesture points
         }
@@ -258,6 +258,13 @@ public class SaveGesturesActivity extends AppCompatActivity {
 
 
     private void openDialog(String name) {
+
+        if(!gestureExists){
+            showToast("Please draw gesture first");
+            reDrawGestureView();
+            return;
+        }
+
         AlertDialog.Builder namePopup = new AlertDialog.Builder(this);
         namePopup.setTitle("Enter Personal Gesture Name");
         //namePopup.setMessage(R.string.enter_name);
@@ -273,7 +280,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
                     saveGesture();
                 } else {
                     openDialog("");
-                    showToast("Invalid");
+                    showToast("Please name your gesture!");
                 }
                 //return;
             }
@@ -297,11 +304,13 @@ public class SaveGesturesActivity extends AppCompatActivity {
         //gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
         //gLib.load();
         // todo : add input name back to recreated Dialog Builder
+
         if(checkExistingName(mGesturename)){
             showToast("Gesture with name already exists");
             openDialog(mGesturename);
             return;
         }
+
         gLib.addGesture(mGesturename, finalGesture);
 
         if (!gLib.save()) {
@@ -314,7 +323,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
         // }
     }
     private void resetEverything(){
-        mGestureDrawn = false;
+        gestureExists = false;
         mCurrentGesture = null;
         mGesturename = "";
     }
