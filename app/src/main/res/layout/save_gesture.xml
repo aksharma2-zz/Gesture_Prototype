@@ -12,8 +12,8 @@
         android:layout_height="464dp"
         android:gestureStrokeType="multiple"
         android:gestureStrokeAngleThreshold="90"
-        android:fadeEnabled="false"
-        android:fadeOffset="200000">
+        android:fadeEnabled="true"
+        android:fadeOffset="2000">
 
 
     </android.gesture.GestureOverlayView>

@@ -132,18 +132,44 @@ public class GestureUtility {
     public static GesturePoint[] spatialSample(GesturePoint[] pts, int n){
         GesturePoint[] newPoints = new GesturePoint[n];
         newPoints[0] = pts[0];
-        int increment = pts.length/n-2;
-        double xIncDist = avgXValue(pts);//euclidDistance(pts[pts.length-1],pts[0]);
-        double yIncDist = avgYValue(pts);
+        double increment = pts.length/n-2;
+
         for(int i=1;i<n-1;i++){
-            float x = pts[increment].x; //(float)(newPoints[i-1].x + xIncDist);
-            float y = pts[increment].y;//(float)(newPoints[i-1].y + yIncDist);
+            float x = pts[(int)Math.floor(increment)].x; //(float)(newPoints[i-1].x + xIncDist);
+            float y = pts[(int)Math.floor(increment)].y;//(float)(newPoints[i-1].y + yIncDist);
             newPoints[i] = new GesturePoint(x,y,SystemClock.currentThreadTimeMillis());
             increment += increment;
         }
+
         newPoints[n-1] = pts[pts.length-1];
         return newPoints;
     }
+
+
+    public static ArrayList<GesturePoint> resample(ArrayList<GesturePoint> points, int n){
+        float I = pathLength(points)/(n-1);
+        float D = 0;
+        ArrayList<GesturePoint> newPoints = new ArrayList<>();
+        newPoints.add(new GesturePoint(points.get(0).x,points.get(0).y,SystemClock.currentThreadTimeMillis()));
+        float x=0;
+        float y=0;
+
+        for(int i=1;i<points.size();i++){
+            double d = euclidDistance(points.get(i-1),points.get(i));
+            if((D+d) >= I) {
+                x = (float) (points.get(i - 1).x + ((I - D) / d) * (points.get(i).x - points.get(i - 1).x));
+                y = (float) (points.get(i - 1).y + ((I - D) / d) * (points.get(i).y - points.get(i - 1).y));
+                newPoints.add(new GesturePoint(x, y, SystemClock.currentThreadTimeMillis()));
+                points.add(i, new GesturePoint(x, y, SystemClock.currentThreadTimeMillis()));
+                D=0;
+            }
+            else
+                D += d;
+        }
+        return newPoints;
+    }
+
+
 
     static double avgXValue(GesturePoint[] pts){
         double xValue=0;
@@ -172,6 +198,15 @@ public class GestureUtility {
         }
         return length;
     }
+
+    public static float pathLength(ArrayList<GesturePoint> points){
+        float length=0;
+        for(int i=1;i<points.size();i++){
+            length += Math.sqrt(Math.pow(points.get(i).x - points.get(i-1).x,2) + Math.pow(points.get(i).y - points.get(i-1).y,2));
+        }
+        return length;
+    }
+
 
     public static ArrayList<GesturePoint> rotate(ArrayList<GesturePoint> points, double radians, float[] centroid) {
         ArrayList<GesturePoint>newPoints = new ArrayList<GesturePoint>(points.size());

@@ -143,7 +143,8 @@ public class SaveGesturesActivity extends AppCompatActivity {
                         Log.d("x point "," is"+gp.x +" "+ gp.y);
                     }
 
-                    gps = GestureUtility.spatialSample(gps,5);
+                    ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(gps));
+                    gp = GestureUtility.resample(gp,8);
                     Log.d("spaced point is "," "+gps[0].x);
                     Log.d("spaced point is "," "+gps[1].x);
                     centroid = GestureUtility.computeCentroid(new ArrayList<GesturePoint>(Arrays.asList(gps))); // centroid of gesture
@@ -151,13 +152,12 @@ public class SaveGesturesActivity extends AppCompatActivity {
                     // float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
                     //  gps = GestureUtility.translated(gps,centroid, gestureView); //translates gesture points of gesture to centroid of gesture being translated to center of screen
                     Log.d("number of points"," is"+ gps.length);
-                    ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(gps));
+
 
                     //add gesture points to allGesturePoints which will be used in OnGesturePerformed
                     for(GesturePoint point: gp) {
                         allGesturePoints.add(point);
                     }
-
 
                     gs = new GestureStroke(gp); // same gesture but sampled to 5 pairs of points
                     for (GesturePoint g : gp) {
@@ -175,8 +175,6 @@ public class SaveGesturesActivity extends AppCompatActivity {
                 reDrawGestureView();
             }
             // gestureView.draw();
-
-
 
             centroid = GestureUtility.computeCentroid(allGesturePoints);
 
@@ -208,8 +206,6 @@ public class SaveGesturesActivity extends AppCompatActivity {
             //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
 
 
-
-
         }
 
         @Override
@@ -228,8 +224,11 @@ public class SaveGesturesActivity extends AppCompatActivity {
             allGesturePoints = GestureUtility.translated(allGesturePoints,centroid, gestureOverlayView);
 
             Log.d("Centroid of points is ", " "+ centroid[0] + " " + centroid[1]);
-            Log.d("performed point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
-            Log.d("performed point is", " "+ allGesturePoints.get(0).y); // translated gesture point x
+
+            for(GesturePoint gp: allGesturePoints) {
+                Log.d("Translated point ", " x " + gp.x + " y " + gp.y); // translated gesture point x and y
+            }
+
             Log.d("length of gesture ", "is " + gesture_length);
 
             //rotate the gesture points
@@ -238,7 +237,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
             Log.d("rotated point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
             Log.d("rotated point is", " "+ allGesturePoints.get(0).y); */
 
-            //translate centroid
+            //translate centroid to centre -> no need
             centroid = GestureUtility.translateCentroid(centroid, gestureOverlayView);
 
             finalGestureStroke = new GestureStroke(allGesturePoints);
@@ -248,6 +247,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
             Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
+
             Arrays.fill(centroid,0); // make centroid -> 0
             //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
         }

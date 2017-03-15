@@ -37,6 +37,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     Gesture testGesture = new Gesture();
     Gesture g2 = new Gesture();
     private GestureLibrary gLib;
+    boolean gestureExists;
     private static final String TAG = "SaveGestureActivity";
     private boolean mGestureDrawn;                      //tc
     private Gesture mCurrentGesture;
@@ -46,10 +47,10 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     private float[] centroid ={};
     static GesturePoint[] points;
     private String mGesturename;
-    private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
     private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated PersonalGesture points
     static GesturePoint[] gps;
     double dist=0;
+    private static ArrayList<GesturePoint>allGesturePoints = new ArrayList<>();
 
     static ArrayList<GesturePoint> gp1 = new ArrayList<>();
     static ArrayList<GesturePoint> gp2 = new ArrayList<>();
@@ -81,6 +82,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         openDialog();
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.test_gesture);
         gestures.addOnGestureListener(mGestureListener);
+        gestures.addOnGesturePerformedListener(onGesturePerformedListener);
       //  gestures.addOnGesturePerformedListener(onGesturePerformedListener);
         resetEverything();
         resetButton.setOnClickListener(
@@ -150,7 +152,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         @Override
         public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
             overlay.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
-            mGestureDrawn = true;
+            gestureExists = true;
             Log.d(TAG, "New PersonalGesture" + SystemClock.elapsedRealtime());
             allGesturePoints.clear(); // remove all existing gesture points
         }
@@ -202,6 +204,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                         allGesturePoints.add(point);
                     }
 
+                    dist = euclidDistance(testGesture);
 
                     gs = new GestureStroke(gp); // same gesture but sampled to 5 pairs of points
                     for (GesturePoint g : gp) {
@@ -252,7 +255,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
 
 
-            dist = euclidDistance(testGesture);
+
 
         }
 
@@ -261,6 +264,42 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             Log.d(TAG, "cancel");
         }
     };
+
+    private GestureOverlayView.OnGesturePerformedListener onGesturePerformedListener = new GestureOverlayView.OnGesturePerformedListener() {
+        @Override
+        public void onGesturePerformed(GestureOverlayView gestureOverlayView, Gesture gesture) {
+            gestureOverlayView.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
+            centroid = GestureUtility.computeCentroid(allGesturePoints);
+
+            //translate points wrt to centroid
+            allGesturePoints = GestureUtility.translated(allGesturePoints,centroid, gestureOverlayView);
+
+            Log.d("Centroid of points is ", " "+ centroid[0] + " " + centroid[1]);
+            Log.d("performed point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
+            Log.d("performed point is", " "+ allGesturePoints.get(0).y); // translated gesture point x
+            Log.d("length of gesture ", "is " + gesture_length);
+
+            //rotate the gesture points
+          /*  Rectangle r = GestureUtility.BoundingBox(allGesturePoints, new Rectangle());
+            allGesturePoints = GestureUtility.RotateToZero(allGesturePoints,centroid, r);
+            Log.d("rotated point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
+            Log.d("rotated point is", " "+ allGesturePoints.get(0).y); */
+
+            //translate centroid
+            centroid = GestureUtility.translateCentroid(centroid, gestureOverlayView);
+
+            finalGestureStroke = new GestureStroke(allGesturePoints);
+            finalGesture = new Gesture();
+            finalGesture.addStroke(finalGestureStroke);
+
+            //  translatedPoints=translatePoints(centroid,allGesturePoints);
+            gesture_length = 0;
+            Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
+            Arrays.fill(centroid,0); // make centroid -> 0
+            //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
+        }
+    };
+
 
 
 
