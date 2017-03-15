@@ -114,8 +114,11 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.i("Length is", ":" +dist);
                 showToast("difference: "+dist);
                 //Toast.makeText(GestureRecognizeActivity.this, ""+dist, Toast.LENGTH_SHORT).show();
-                if(dist<500)
-                    Toast.makeText(GestureRecognizeActivity.this, "Gesture recognized", Toast.LENGTH_SHORT).show();
+
+
+                if(dist<300) {
+                    showToast("Gesture detected");
+                }
 
             }
         });
@@ -183,28 +186,27 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
                 for (GestureStroke gs : strokes) {
                     //convert float[] points of stroke to GesturePoint array
-                     gps = GestureUtility.floatToGP(gs.points);
+                    GesturePoint[] gps = GestureUtility.floatToGP(gs.points);
                     //Spatially sample GesturePoints
                     for(GesturePoint gp:gps){
                         Log.d("x point "," is"+gp.x +" "+ gp.y);
                     }
 
-                    gps = GestureUtility.spatialSample(gps,5);
+                    ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(gps));
+                    gp = GestureUtility.resample(gp,8);
                     Log.d("spaced point is "," "+gps[0].x);
                     Log.d("spaced point is "," "+gps[1].x);
                     centroid = GestureUtility.computeCentroid(new ArrayList<GesturePoint>(Arrays.asList(gps))); // centroid of gesture
 
                     // float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
                     //  gps = GestureUtility.translated(gps,centroid, gestureView); //translates gesture points of gesture to centroid of gesture being translated to center of screen
-                    Log.d("number of points"," is"+ gps.length);
-                    ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(gps));
+                    Log.d("number of points"," is"+ gp.size());
+
 
                     //add gesture points to allGesturePoints which will be used in OnGesturePerformed
                     for(GesturePoint point: gp) {
                         allGesturePoints.add(point);
                     }
-
-                    dist = euclidDistance(testGesture);
 
                     gs = new GestureStroke(gp); // same gesture but sampled to 5 pairs of points
                     for (GesturePoint g : gp) {
@@ -222,8 +224,6 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 reDrawGestureView();
             }
             // gestureView.draw();
-
-
 
             centroid = GestureUtility.computeCentroid(allGesturePoints);
 
@@ -248,15 +248,21 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             finalGesture = new Gesture();
             finalGesture.addStroke(finalGestureStroke);
 
+            centroid = GestureUtility.computeCentroid(allGesturePoints);
+
+            //translate points wrt to centroid
+            allGesturePoints = GestureUtility.translated(allGesturePoints,centroid, gestureView);
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
             Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
             Arrays.fill(centroid,0); // make centroid -> 0
             //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
 
+            for (GesturePoint g : allGesturePoints) {
+                Log.d("Translated point is x ", Float.toString(g.x) + " y: " + Float.toString(g.y));
+            }
 
-
-
+           dist = euclidDistance(testGesture);
         }
 
         @Override
@@ -275,8 +281,11 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             allGesturePoints = GestureUtility.translated(allGesturePoints,centroid, gestureOverlayView);
 
             Log.d("Centroid of points is ", " "+ centroid[0] + " " + centroid[1]);
-            Log.d("performed point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
-            Log.d("performed point is", " "+ allGesturePoints.get(0).y); // translated gesture point x
+
+            for(GesturePoint gp: allGesturePoints) {
+                Log.d("Translated point ", " x " + gp.x + " y " + gp.y); // translated gesture point x and y
+            }
+
             Log.d("length of gesture ", "is " + gesture_length);
 
             //rotate the gesture points
@@ -285,7 +294,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             Log.d("rotated point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
             Log.d("rotated point is", " "+ allGesturePoints.get(0).y); */
 
-            //translate centroid
+            //translate centroid to centre -> no need
             centroid = GestureUtility.translateCentroid(centroid, gestureOverlayView);
 
             finalGestureStroke = new GestureStroke(allGesturePoints);
@@ -295,13 +304,11 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
             Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
+
             Arrays.fill(centroid,0); // make centroid -> 0
             //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
         }
     };
-
-
-
 
 
 
@@ -322,8 +329,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
       //  GestureStroke gs1 = g1.getStrokes().get(0);
        // GestureStroke gs2 = g2.getStrokes().get(0);
 
-        for(int i=0;i<5;i++){
-            diff1 = euclidDistance(points[i], gps[i]);
+        for(int i=0;i<7;i++){
+            diff1 = euclidDistance(points[i], allGesturePoints.get(i));
             //diff2 = euclidDistance(gps[i],x);
             diff += Math.abs(diff1); // diff += Math.abs(diff2 - diff1);
         }

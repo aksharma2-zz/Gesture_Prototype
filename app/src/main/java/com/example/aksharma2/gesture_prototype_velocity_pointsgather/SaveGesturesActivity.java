@@ -151,7 +151,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
 
                     // float[] newPoints = GestureUtils.temporalSampling(gs, 5); // samples them to 5 pairs of points
                     //  gps = GestureUtility.translated(gps,centroid, gestureView); //translates gesture points of gesture to centroid of gesture being translated to center of screen
-                    Log.d("number of points"," is"+ gps.length);
+                    Log.d("number of points"," is"+ gp.size());
 
 
                     //add gesture points to allGesturePoints which will be used in OnGesturePerformed

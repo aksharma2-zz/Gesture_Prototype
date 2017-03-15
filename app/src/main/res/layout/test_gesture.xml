@@ -13,7 +13,7 @@
         android:gestureStrokeType="multiple"
         android:gestureStrokeAngleThreshold="90"
         android:fadeEnabled="false"
-        android:fadeOffset="200000">
+        android:fadeOffset="20000">
 
 
     </android.gesture.GestureOverlayView>
