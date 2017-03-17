@@ -50,7 +50,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     private String mGesturename;
     private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated PersonalGesture points
     private ArrayList<GestureStroke>allGestureStrokes = new ArrayList<>(); // all gesture strokes of gesture
-    private static ArrayList<GesturePoint>allGesturePoints = new ArrayList<>();
+    private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>();
     static GesturePoint[] gps;
     double dist = 0;
     int index = 0; // keep track of gesture stroke index of loaded gesture
@@ -304,7 +304,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         return Math.sqrt(Math.pow(pt2.x - pt1.x,2) + Math.pow(pt2.y - pt1.y,2));
     }
 
-    public static double euclidDistance(Gesture testGesture){
+    /*public static double euclidDistance(Gesture testGesture){
         double diff=0;
         double diff1=0;
         double diff2=0;
@@ -323,7 +323,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             diff += Math.abs(diff1); // diff += Math.abs(diff2 - diff1);
         }
         return diff;
-    }
+    } */
 
 
 
@@ -332,6 +332,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         mCurrentGesture = null;
         mGesturename = "";
         index = 0;
+        allGesturePoints.clear();
+        allGestureStrokes.clear();
     }
 
     private void reDrawGestureView() {
@@ -415,6 +417,11 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         double difference = 0;
         ArrayList<GestureStroke> g1_strokes = g1.getStrokes();
         ArrayList<GestureStroke> g2_strokes = g2.getStrokes();
+
+        if(g2_strokes.size() != g1_strokes.size()){
+            difference = 10000;
+            return difference;
+        }
 
         for(int i=0; i<g1_strokes.size(); i++){
             GesturePoint[] gp1 = GestureUtility.floatToGP(g1_strokes.get(i).points);
