@@ -109,25 +109,6 @@ public class GestureUtility {
         return newPoints;
     }
 
-    public static ArrayList <GesturePoint> resample(GesturePoint[] pts, int n){
-        float incrementLength = pathLength(pts)/(n-1);
-        float Dist=0;
-        ArrayList<GesturePoint> newPoints = new ArrayList<>();
-        for(int i=1; i<pts.length;i++){
-            double d= euclidDistance(pts[i],pts[i-1]);
-            if((Dist + d)>= incrementLength){
-                float newX =(float) (pts[i-1].x + ((incrementLength - Dist) / d) * (pts[i].x - pts[i-1].x));
-                float newY =(float) (pts[i-1].y + ((incrementLength - Dist) / d) * (pts[i].y - pts[i-1].y));
-                GesturePoint newPoint = new GesturePoint(newX,newY,SystemClock.currentThreadTimeMillis());
-                newPoints.add(newPoint);
-                pts[i] = newPoint;
-            }
-            else{
-                Dist += d;
-            }
-        }
-        return newPoints;
-    }
 
     public static GesturePoint[] spatialSample(GesturePoint[] pts, int n){
         GesturePoint[] newPoints = new GesturePoint[n];

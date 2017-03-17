@@ -21,16 +21,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
-//import pack.GestureApp.R;
 
 public class SaveGesturesActivity extends AppCompatActivity {
     private GestureLibrary gLib;
     private static final String TAG = "SaveGestureActivity";
-    private boolean gestureExists;                      //tc
+    private boolean gestureExists;
     private Gesture mCurrentGesture;
     private GestureStroke finalGestureStroke;
     private Gesture finalGesture;
@@ -40,7 +40,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
     private Button resetButton;
     private GestureLibrary gesture_lib;
     private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
-    private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated PersonalGesture points
+    private ArrayList<GestureStroke>allGestureStrokes = new ArrayList<>(); // all gesture strokes of gesture
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,6 +78,9 @@ public class SaveGesturesActivity extends AppCompatActivity {
                 reDrawGestureView();
                 break;
             case R.id.Save:
+               for(GestureStroke gs: allGestureStrokes){
+                   finalGesture.addStroke(gs);
+               }
                openDialog("");
                 break;
 
@@ -159,7 +162,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
                         allGesturePoints.add(point);
                     }
 
-                    gs = new GestureStroke(gp); // same gesture but sampled to 5 pairs of points
+                    gs = new GestureStroke(gp); // same gesture but sampled to 8 pairs of points
                     for (GesturePoint g : gp) {
                         Log.d("point is x ", Float.toString(g.x) + " y: " + Float.toString(g.y));
                     }
@@ -174,7 +177,6 @@ public class SaveGesturesActivity extends AppCompatActivity {
                 Log.d("Exception occured ", e.getMessage());
                 reDrawGestureView();
             }
-            // gestureView.draw();
 
             centroid = GestureUtility.computeCentroid(allGesturePoints);
 
@@ -196,15 +198,14 @@ public class SaveGesturesActivity extends AppCompatActivity {
             centroid = GestureUtility.translateCentroid(centroid, gestureView);
 
             finalGestureStroke = new GestureStroke(allGesturePoints);
-            finalGesture = new Gesture();
-            finalGesture.addStroke(finalGestureStroke);
+            allGestureStrokes.add(finalGestureStroke);
+
+            // finalGesture = new Gesture();
+           // finalGesture.addStroke(finalGestureStroke);
 
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
-            Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
             Arrays.fill(centroid,0); // make centroid -> 0
-            //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
-
 
         }
 
@@ -254,7 +255,9 @@ public class SaveGesturesActivity extends AppCompatActivity {
     };
 
 
-    // *** Helper methods underneath ***
+
+                      // ******************** Helper methods underneath ********************
+
 
 
     private void openDialog(String name) {
@@ -300,10 +303,6 @@ public class SaveGesturesActivity extends AppCompatActivity {
     }
 
     private void saveGesture() {
-        // if(!mGesturename.matches("")) {
-        //gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
-        //gLib.load();
-        // todo : add input name back to recreated Dialog Builder
 
         if(checkExistingName(mGesturename)){
             showToast("Gesture with name already exists");
@@ -320,12 +319,14 @@ public class SaveGesturesActivity extends AppCompatActivity {
             Log.i(TAG,"gesture saved!");
         }
         reDrawGestureView();
-        // }
     }
+
     private void resetEverything(){
         gestureExists = false;
         mCurrentGesture = null;
         mGesturename = "";
+        allGesturePoints.clear();
+        allGestureStrokes.clear();
     }
 
     private void reDrawGestureView() {

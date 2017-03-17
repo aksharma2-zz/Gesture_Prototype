@@ -53,22 +53,13 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     private static ArrayList<GesturePoint>allGesturePoints = new ArrayList<>();
 
     static ArrayList<GesturePoint> gp1 = new ArrayList<>();
-    static ArrayList<GesturePoint> gp2 = new ArrayList<>();
-
-
-   static GesturePoint x = new GesturePoint(540,690,SystemClock.currentThreadTimeMillis());
+    static GesturePoint x = new GesturePoint(540,690,SystemClock.currentThreadTimeMillis());
 
     GesturePoint p1 = new GesturePoint(220,60, SystemClock.currentThreadTimeMillis());
     GesturePoint p2 = new GesturePoint(300,60, SystemClock.currentThreadTimeMillis());
     GesturePoint p3 = new GesturePoint(380,60, SystemClock.currentThreadTimeMillis());
     GesturePoint p4 = new GesturePoint(580,60, SystemClock.currentThreadTimeMillis());
     GesturePoint p5 = new GesturePoint(900,60, SystemClock.currentThreadTimeMillis());
-
-
-    GesturePoint q1 = new GesturePoint(60,60, SystemClock.currentThreadTimeMillis());
-    GesturePoint q2 = new GesturePoint(80,80, SystemClock.currentThreadTimeMillis());
-    GesturePoint q3 = new GesturePoint(100,100, SystemClock.currentThreadTimeMillis());
-    GesturePoint q4 = new GesturePoint(120,120, SystemClock.currentThreadTimeMillis());
 
     Button b, resetButton;
 
@@ -97,14 +88,10 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
 
         gp1.add(p1); gp1.add(p2); gp1.add(p3); gp1.add(p4); gp1.add(p5);
-        gp2.add(q1); gp2.add(q2); gp2.add(q3); gp2.add(q4);
 
         GestureStroke gs1 = new GestureStroke(gp1);
-        GestureStroke gs2 = new GestureStroke(gp2);
 
         g1.addStroke(gs1);
-        g1.addStroke(gs2);
-
         b = (Button)findViewById(R.id.gesture_value_button);
 
 
@@ -114,11 +101,6 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.i("Length is", ":" +dist);
                 showToast("difference: "+dist);
                 //Toast.makeText(GestureRecognizeActivity.this, ""+dist, Toast.LENGTH_SHORT).show();
-
-
-                if(dist<300) {
-                    showToast("Gesture detected");
-                }
 
             }
         });
@@ -139,6 +121,9 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             case R.id.gesture_test:
                 Log.i("Gesture"," Difference: "+dist);
                 showToast("Difference: "+dist);
+                if(dist<300) {
+                    showToast("Gesture detected");
+                }
                 break;
 
             case R.id.gesture_remove:
