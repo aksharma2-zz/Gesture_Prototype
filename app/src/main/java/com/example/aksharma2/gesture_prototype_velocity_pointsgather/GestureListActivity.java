@@ -7,7 +7,12 @@ import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -43,14 +48,39 @@ public class GestureListActivity extends Activity {
         gestureListView.setAdapter(gestureAdapter);
         delButton=(Button)findViewById(R.id.delete_button);
         renameButton=(Button)findViewById(R.id.rename_button);
+        gestureListView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showPopup(v);
+                Log.i("hi","there");
+                return true;
+            }
+        });
        // addButton = (Button) findViewById(R.id.button_gesture_add);
        // testButton = (Button) findViewById(R.id.button_gesture_test);
 
         // displays the popup context top_menu to either delete or resend measurement
-        registerForContextMenu(gestureListView);
+        this.registerForContextMenu(gestureListView);
+    }
+
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.options_menu, popup.getMenu());
+        popup.show();
     }
 
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getMenuInflater().inflate(R.menu.options_menu,menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        Log.i("Touch", "Test");
+        return true;
+    }
 
     @Override
     public void onResume(){
@@ -66,9 +96,27 @@ public class GestureListActivity extends Activity {
         gestureAdapter = new GestureAdapter(mGestureList, GestureListActivity.this);
         gestureListView.setLongClickable(true);
         gestureListView.setAdapter(gestureAdapter);
-        // displays the popup context top_menu to either delete or resend measurement
-        registerForContextMenu(gestureListView);
 
+        gestureListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("I","click");
+              //  GestureView gv = (GestureView)parent.getItemAtPosition(position);
+              //  mCurrentGestureName = gv.gesture_name.toString();
+
+            }
+        });
+        // displays the popup context top_menu to either delete or resend measurement
+        // registerForContextMenu(gestureListView);
+
+
+    }
+
+    public void getName(View v){
+        LinearLayout parentRow = (LinearLayout)v.getParent().getParent();
+        TextView tv = (TextView)parentRow.findViewById(R.id.gesture_name);
+        String name = tv.getText().toString();
+        Log.i("Name is"," "+name);
     }
 
     private void makeList() {
@@ -109,12 +157,17 @@ public class GestureListActivity extends Activity {
     }
 
     public void deleteButtonClick(View v){
+      //  mCurrentGestureName=v.getParent().
+        LinearLayout ll = (LinearLayout)v.getParent().getParent();
+        TextView tv = (TextView)ll.findViewById(R.id.gesture_name);
+        mCurrentGestureName = tv.getText().toString();
         Log.i("Click"," Delete Gesture");
-        gestureLibrary.removeEntry(mCurrentGestureName);
+        Log.i("Gesture name"," :"+mCurrentGestureName);
+      /*  gestureLibrary.removeEntry(mCurrentGestureName);
         gestureLibrary.save();
         mCurrentGestureName = "";
         gestureAdapter.notifyDataSetChanged();
-        onResume();
+        onResume(); */
     }
 
    /* public void renameButtonClick(View v){

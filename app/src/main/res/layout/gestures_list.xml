@@ -9,7 +9,11 @@
         android:layout_height="459dp"
         android:divider="@color/colorPrimaryDark"
         android:dividerHeight="1dp"
-        android:id="@+id/gestures_list" />
+        android:focusable="true"
+        android:id="@+id/gestures_list"
+        android:clickable="true"
+        android:longClickable="true"
+        android:descendantFocusability="blocksDescendants"/>
 
     <LinearLayout
         android:orientation="horizontal"
