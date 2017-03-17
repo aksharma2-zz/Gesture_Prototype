@@ -53,6 +53,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>();
     static GesturePoint[] gps;
     double dist = 0;
+    float lengthDiff = 0;
     int index = 0; // keep track of gesture stroke index of loaded gesture
     static ArrayList<GesturePoint> gp1 = new ArrayList<>();
     GesturePoint p1 = new GesturePoint(220,60, SystemClock.currentThreadTimeMillis());
@@ -121,6 +122,13 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             case R.id.gesture_test:
                 Log.i("Gesture"," Difference: "+dist);
                 showToast("Difference: "+dist);
+                Log.i(" Test Gesture "," Length: "+testGesture.getLength());
+                Log.i("Sample Gesture"," Length: "+finalGesture.getLength());
+                showStrokeLength(testGesture);
+                Log.i("Sample","Gesture");
+                showStrokeLength(finalGesture);
+                Log.i("Gesture"," Difference: "+dist);
+                showToast("Length difference: "+lengthDiff);
                 if(dist<300) {
                     showToast("Gesture detected");
                 }
@@ -144,6 +152,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             Log.d(TAG, "New PersonalGesture" + SystemClock.elapsedRealtime());
             allGesturePoints.clear(); // remove all existing gesture points
             finalGesture = new Gesture();
+            lengthDiff = 0;
         }
 
         @Override
@@ -251,6 +260,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
             //dist = euclidDistance(testGesture);
             dist = calcDiff(finalGesture, testGesture);
+            lengthDiff = calcLengthDiff(finalGesture, testGesture);
         }
 
         @Override
@@ -334,6 +344,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         index = 0;
         allGesturePoints.clear();
         allGestureStrokes.clear();
+        lengthDiff = 0;
     }
 
     private void reDrawGestureView() {
@@ -434,12 +445,31 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         return difference;
     }
 
+    private float calcLengthDiff(Gesture g1, Gesture g2){
+        float diff = 0;
+        ArrayList<GestureStroke> g1_strokes = g1.getStrokes();
+        ArrayList<GestureStroke> g2_strokes = g2.getStrokes();
+
+        for(int i=0; i<g1_strokes.size(); i++){
+            diff += Math.abs(g2_strokes.get(i).length - g1_strokes.get(i).length);
+        }
+        return diff;
+    }
+
     void showGestureSpecs() {
         GestureStroke gs = testGesture.getStrokes().get(0);
         GesturePoint[] gp = GestureUtility.floatToGP(gs.points);
 
         for (int i = 0; i < gp.length; i++) {
             Log.i("Points", " X " + gp[0].x + " Y " + gp[0].y);
+        }
+    }
+
+    void showStrokeLength(Gesture g){
+        ArrayList<GestureStroke>gs = g.getStrokes();
+        for(GestureStroke gss: gs){
+            Log.i("length stroke",""+gss.length);
+
         }
     }
 
