@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
@@ -48,13 +49,12 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     static GesturePoint[] points;
     private String mGesturename;
     private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated PersonalGesture points
-    static GesturePoint[] gps;
-    double dist=0;
+    private ArrayList<GestureStroke>allGestureStrokes = new ArrayList<>(); // all gesture strokes of gesture
     private static ArrayList<GesturePoint>allGesturePoints = new ArrayList<>();
-
+    static GesturePoint[] gps;
+    double dist = 0;
+    int index = 0; // keep track of gesture stroke index of loaded gesture
     static ArrayList<GesturePoint> gp1 = new ArrayList<>();
-    static GesturePoint x = new GesturePoint(540,690,SystemClock.currentThreadTimeMillis());
-
     GesturePoint p1 = new GesturePoint(220,60, SystemClock.currentThreadTimeMillis());
     GesturePoint p2 = new GesturePoint(300,60, SystemClock.currentThreadTimeMillis());
     GesturePoint p3 = new GesturePoint(380,60, SystemClock.currentThreadTimeMillis());
@@ -143,6 +143,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             gestureExists = true;
             Log.d(TAG, "New PersonalGesture" + SystemClock.elapsedRealtime());
             allGesturePoints.clear(); // remove all existing gesture points
+            finalGesture = new Gesture();
         }
 
         @Override
@@ -230,16 +231,11 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             centroid = GestureUtility.translateCentroid(centroid, gestureView);
 
             finalGestureStroke = new GestureStroke(allGesturePoints);
-            finalGesture = new Gesture();
-            finalGesture.addStroke(finalGestureStroke);
+            allGestureStrokes.add(finalGestureStroke);
 
-            centroid = GestureUtility.computeCentroid(allGesturePoints);
 
-            //translate points wrt to centroid
-            allGesturePoints = GestureUtility.translated(allGesturePoints,centroid, gestureView);
-            //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
-            Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
+           // Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
             Arrays.fill(centroid,0); // make centroid -> 0
             //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
 
@@ -247,7 +243,14 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.d("Translated point is x ", Float.toString(g.x) + " y: " + Float.toString(g.y));
             }
 
-           dist = euclidDistance(testGesture);
+            Log.i(TAG, "Stroke ended");
+
+            for(GestureStroke gs: allGestureStrokes){
+                finalGesture.addStroke(gs);
+            }
+
+            //dist = euclidDistance(testGesture);
+            dist = calcDiff(finalGesture, testGesture);
         }
 
         @Override
@@ -328,6 +331,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         mGestureDrawn = false;
         mCurrentGesture = null;
         mGesturename = "";
+        index = 0;
     }
 
     private void reDrawGestureView() {
@@ -387,13 +391,11 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                     Set<String> gestureSet = gLib.getGestureEntries();
                     for (String gName : gestureSet) {
                         ArrayList<Gesture> list = gLib.getGestures(text);
-                        for (Gesture g : list) {
-                            Log.i("Gesture ", "" + g.getStrokesCount());
-                        }
                         testGesture=list.get(0);
-
                         //   testGesture = gLib.getGestures(text).get(0);
                     }
+                    Log.i("Gesture ", "Stroke Count = " + testGesture.getStrokesCount());
+
                 }catch (NullPointerException npe){
 
                     Log.e("Gesture:", " Doesn't exist");
@@ -407,6 +409,22 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         Log.i("Stroke count: ",""+testGesture.getStrokesCount());
        // testGesture.
 
+    }
+
+    private double calcDiff(Gesture g1, Gesture g2){
+        double difference = 0;
+        ArrayList<GestureStroke> g1_strokes = g1.getStrokes();
+        ArrayList<GestureStroke> g2_strokes = g2.getStrokes();
+
+        for(int i=0; i<g1_strokes.size(); i++){
+            GesturePoint[] gp1 = GestureUtility.floatToGP(g1_strokes.get(i).points);
+            GesturePoint[] gp2 = GestureUtility.floatToGP(g2_strokes.get(i).points);
+
+            for(int j=0; i<gp1.length; i++){
+                difference += euclidDistance(gp1[j], gp2[j]);
+            }
+        }
+        return difference;
     }
 
     void showGestureSpecs() {
