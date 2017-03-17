@@ -78,9 +78,6 @@ public class SaveGesturesActivity extends AppCompatActivity {
                 reDrawGestureView();
                 break;
             case R.id.Save:
-               for(GestureStroke gs: allGestureStrokes){
-                   finalGesture.addStroke(gs);
-               }
                openDialog("");
                 break;
 
@@ -110,8 +107,9 @@ public class SaveGesturesActivity extends AppCompatActivity {
         public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
             overlay.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
             gestureExists = true;
-            Log.d(TAG, "New PersonalGesture" + SystemClock.elapsedRealtime());
+            Log.d(TAG, "New Gesture Stroke");
             allGesturePoints.clear(); // remove all existing gesture points
+            finalGesture = new Gesture();
         }
 
         @Override
@@ -121,7 +119,6 @@ public class SaveGesturesActivity extends AppCompatActivity {
 
         @Override
         public void onGestureEnded(final GestureOverlayView gestureView, MotionEvent motion) {
-            Log.d(TAG, "PersonalGesture stroke ended");
             try {
 
                 if(!GestureUtility.strokeLengthThreshold(gestureView, gestureView.getGesture(), 150)){
@@ -206,6 +203,11 @@ public class SaveGesturesActivity extends AppCompatActivity {
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
             Arrays.fill(centroid,0); // make centroid -> 0
+
+            Log.i(TAG,"Gesture stroke ended");
+            for(GestureStroke gs: allGestureStrokes){
+                finalGesture.addStroke(gs);
+            }
 
         }
 
