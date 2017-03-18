@@ -360,6 +360,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         allGesturePoints.clear();
         allGestureStrokes.clear();
         lengthDiff = 0;
+        timeDiff = 0;
     }
 
     private void reDrawGestureView() {
