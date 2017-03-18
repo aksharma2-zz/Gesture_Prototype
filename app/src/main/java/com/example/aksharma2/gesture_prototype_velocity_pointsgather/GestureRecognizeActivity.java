@@ -67,7 +67,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     Button b, resetButton;
     long start;
     double end;
-    double velocityDiff;
+    double timeDiff;
 
 
 
@@ -134,6 +134,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 showStrokeLength(finalGesture);
                 Log.i("Gesture"," Difference: "+dist);
                 showToast("Length difference: "+lengthDiff);
+                Log.i("Gesture", "Time Difference: "+timeDiff);
+                showToast("Gesture Time Difference: "+timeDiff);
                 if(dist<300) {
                     showToast("Gesture detected");
                 }
@@ -273,7 +275,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             //dist = euclidDistance(testGesture);
             dist = calcDiff(finalGesture, testGesture);
             lengthDiff = calcLengthDiff(finalGesture, testGesture);
-            velocityDiff = velocityDifference(finalGesture, testGesture);
+            timeDiff = velocityDifference(finalGesture, testGesture);
         }
 
         @Override
