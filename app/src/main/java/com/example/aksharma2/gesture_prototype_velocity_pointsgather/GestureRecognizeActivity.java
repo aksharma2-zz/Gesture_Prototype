@@ -276,6 +276,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             dist = calcDiff(finalGesture, testGesture);
             lengthDiff = calcLengthDiff(finalGesture, testGesture);
             timeDiff = velocityDifference(finalGesture, testGesture);
+            Log.i("Time","Diff" +timeDiff);
         }
 
         @Override
@@ -502,8 +503,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         ArrayList<MyGestureStroke> mgs1 = GestureUtility.convertToMyGestureStroke(g1.getStrokes());
         ArrayList<MyGestureStroke> mgs2 = GestureUtility.convertToMyGestureStroke(g2.getStrokes());
 
-        for(int i=0; i<mgs2.size(); i++){
-            vel_diff += Math.abs(mgs2.get(i).getStroke_velocity() - mgs1.get(i).getStroke_velocity());
+        for(int i=0; i<mgs1.size(); i++){
+            vel_diff += Math.abs(mgs1.get(i).getStroke_velocity() - mgs2.get(i).getStroke_velocity());
         }
         return vel_diff;
     }
