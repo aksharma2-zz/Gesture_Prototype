@@ -429,8 +429,9 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         ArrayList<GestureStroke> g1_strokes = g1.getStrokes();
         ArrayList<GestureStroke> g2_strokes = g2.getStrokes();
 
+
         if(g2_strokes.size() != g1_strokes.size()){
-            difference = 10000;
+            difference = Double.MAX_VALUE;
             return difference;
         }
 
@@ -449,9 +450,16 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         float diff = 0;
         ArrayList<GestureStroke> g1_strokes = g1.getStrokes();
         ArrayList<GestureStroke> g2_strokes = g2.getStrokes();
-
+        double gp1_initial_diff = 0;
+        double gp2_initial_diff = 0;
+        //Log.i("Stroke length 0","g1 "+ g1_strokes.get(0).length);
         for(int i=0; i<g1_strokes.size(); i++){
-            diff += Math.abs(g2_strokes.get(i).length - g1_strokes.get(i).length);
+            Log.i("Stroke length 0","g2 "+ (g2_strokes.get(i).length - gp2_initial_diff));
+            Log.i("Stroke length 1","g2 "+ (g1_strokes.get(i).length - gp1_initial_diff));
+
+            diff += Math.abs((g2_strokes.get(i).length - gp2_initial_diff) - (g1_strokes.get(i).length - gp1_initial_diff));
+            gp1_initial_diff = g1_strokes.get(i).length;
+            gp2_initial_diff = g2_strokes.get(i).length;
         }
         return diff;
     }
