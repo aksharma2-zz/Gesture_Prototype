@@ -8,6 +8,7 @@ import android.os.SystemClock;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by aksharma2 on 31-01-2017.
@@ -271,6 +272,19 @@ public class GestureUtility {
         return true;
     }
 
+
+    public static ArrayList<MyGestureStroke> convertToMyGestureStroke(ArrayList<GestureStroke> gs){
+        ArrayList<MyGestureStroke> mgs = new ArrayList<>();
+
+        for(int i=0; i<gs.size(); i++){
+            GestureStroke gestureStroke = gs.get(i);
+            GesturePoint[] point = floatToGP(gestureStroke.points);
+            ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(point));
+            MyGestureStroke mg = new MyGestureStroke(gp);
+            mgs.add(mg);
+        }
+        return mgs;
+    }
 
 
 }

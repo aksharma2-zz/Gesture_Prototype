@@ -33,6 +33,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
     private boolean gestureExists;
     private Gesture mCurrentGesture;
     private GestureStroke finalGestureStroke;
+    private MyGestureStroke myGestureStroke;
     private Gesture finalGesture;
     public float gesture_length;
     private float[] centroid ={};
@@ -41,6 +42,9 @@ public class SaveGesturesActivity extends AppCompatActivity {
     private GestureLibrary gesture_lib;
     private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>(); // to calculate centroid of all gesture points
     private ArrayList<GestureStroke>allGestureStrokes = new ArrayList<>(); // all gesture strokes of gesture
+    private ArrayList<MyGestureStroke>myGestureStrokes = new ArrayList<>();
+    long start;
+    double end;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -110,6 +114,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
             Log.d(TAG, "New Gesture Stroke");
             allGesturePoints.clear(); // remove all existing gesture points
             finalGesture = new Gesture();
+            start = System.currentTimeMillis();
         }
 
         @Override
@@ -127,6 +132,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
                     return;
                 }
 
+                end = ((System.currentTimeMillis() - start) / 1000.000) ;
                 gesture_length = mCurrentGesture.getLength();
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
@@ -195,20 +201,32 @@ public class SaveGesturesActivity extends AppCompatActivity {
             centroid = GestureUtility.translateCentroid(centroid, gestureView);
 
             finalGestureStroke = new GestureStroke(allGesturePoints);
+            myGestureStroke = new MyGestureStroke(allGesturePoints);
+            myGestureStroke.setStroke_velocity(end);
+
             allGestureStrokes.add(finalGestureStroke);
+            myGestureStrokes.add(myGestureStroke);
 
             // finalGesture = new Gesture();
            // finalGesture.addStroke(finalGestureStroke);
 
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
-            gesture_length = 0;
-            Arrays.fill(centroid,0); // make centroid -> 0
 
             Log.i(TAG,"Gesture stroke ended");
-            for(GestureStroke gs: allGestureStrokes){
+            Log.i(TAG,"Gesture Stroke time: "+myGestureStroke.getStroke_velocity());
+
+            /* for(GestureStroke gs: allGestureStrokes){
                 finalGesture.addStroke(gs);
+            } */
+
+            for(MyGestureStroke mgs: myGestureStrokes){
+                finalGesture.addStroke(mgs);
             }
 
+            gesture_length = 0;
+            Arrays.fill(centroid,0); // make centroid -> 0
+            start = 0;
+            end = 0;
         }
 
         @Override
@@ -329,6 +347,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
         mGesturename = "";
         allGesturePoints.clear();
         allGestureStrokes.clear();
+        myGestureStrokes.clear();
     }
 
     private void reDrawGestureView() {

@@ -43,6 +43,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     private boolean mGestureDrawn;                      //tc
     private Gesture mCurrentGesture;
     private GestureStroke finalGestureStroke;
+    private MyGestureStroke myGestureStroke;
     private Gesture finalGesture;
     public float gesture_length;
     private float[] centroid ={};
@@ -51,6 +52,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     private ArrayList<GesturePoint>translatedPoints = new ArrayList<>(); // new translated PersonalGesture points
     private ArrayList<GestureStroke>allGestureStrokes = new ArrayList<>(); // all gesture strokes of gesture
     private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>();
+    private ArrayList<MyGestureStroke>myGestureStrokes = new ArrayList<>();
     static GesturePoint[] gps;
     double dist = 0;
     float lengthDiff = 0;
@@ -63,6 +65,9 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     GesturePoint p5 = new GesturePoint(900,60, SystemClock.currentThreadTimeMillis());
 
     Button b, resetButton;
+    long start;
+    double end;
+    double velocityDiff;
 
 
 
@@ -153,6 +158,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             allGesturePoints.clear(); // remove all existing gesture points
             finalGesture = new Gesture();
             lengthDiff = 0;
+            start = System.currentTimeMillis();
         }
 
         @Override
@@ -171,6 +177,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                     return;
                 }
 
+                end = ((System.currentTimeMillis() - start) / 1000.000) ;
                 gesture_length = mCurrentGesture.getLength();
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
@@ -240,7 +247,12 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             centroid = GestureUtility.translateCentroid(centroid, gestureView);
 
             finalGestureStroke = new GestureStroke(allGesturePoints);
+            myGestureStroke = new MyGestureStroke(allGesturePoints);
+            myGestureStroke.setStroke_velocity(end);
+
+
             allGestureStrokes.add(finalGestureStroke);
+            myGestureStrokes.add(myGestureStroke);
 
 
             gesture_length = 0;
@@ -254,13 +266,14 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
             Log.i(TAG, "Stroke ended");
 
-            for(GestureStroke gs: allGestureStrokes){
-                finalGesture.addStroke(gs);
+            for(MyGestureStroke mgs: myGestureStrokes){
+                finalGesture.addStroke(mgs);
             }
 
             //dist = euclidDistance(testGesture);
             dist = calcDiff(finalGesture, testGesture);
             lengthDiff = calcLengthDiff(finalGesture, testGesture);
+            velocityDiff = velocityDifference(finalGesture, testGesture);
         }
 
         @Override
@@ -479,6 +492,17 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             Log.i("length stroke",""+gss.length);
 
         }
+    }
+
+    public double velocityDifference(Gesture g1, Gesture g2){
+        double vel_diff = 0;
+        ArrayList<MyGestureStroke> mgs1 = GestureUtility.convertToMyGestureStroke(g1.getStrokes());
+        ArrayList<MyGestureStroke> mgs2 = GestureUtility.convertToMyGestureStroke(g2.getStrokes());
+
+        for(int i=0; i<mgs2.size(); i++){
+            vel_diff += Math.abs(mgs2.get(i).getStroke_velocity() - mgs1.get(i).getStroke_velocity());
+        }
+        return vel_diff;
     }
 
 }
