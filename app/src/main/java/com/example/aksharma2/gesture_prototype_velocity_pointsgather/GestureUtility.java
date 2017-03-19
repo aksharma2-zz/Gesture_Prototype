@@ -287,4 +287,26 @@ public class GestureUtility {
     }
 
 
+    public static double gestureScoreCompute(double t_dist, float t_length_diff, float t_time_diff, double s_dist, float s_length_diff, float s_time_diff){
+        return 1 - ((0.3 * calcPercentage(t_dist, s_dist)) + (0.4 * calcPercentage(t_length_diff, s_length_diff)) +
+                (0.3 * calcPercentage(t_time_diff, s_time_diff))
+        );
+    }
+
+    public static double calcPercentage(double x, double y){
+        return Math.abs((x-y)/x);
+    }
+
+    public static double calcGestureLength(Gesture g){
+        double length = 0;
+        ArrayList<GestureStroke> gs = g.getStrokes();
+        for(GestureStroke gestureStroke: gs){
+            length += gestureStroke.length;
+        }
+        return length;
+    }
+
+
+
+
 }

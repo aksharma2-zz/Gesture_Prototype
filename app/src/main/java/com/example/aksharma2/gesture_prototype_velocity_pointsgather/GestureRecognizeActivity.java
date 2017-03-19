@@ -56,8 +56,6 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     private ArrayList<GesturePoint>allGesturePoints = new ArrayList<>();
     private ArrayList<MyGestureStroke>myGestureStrokes = new ArrayList<>();
     static GesturePoint[] gps;
-    double dist = 0;
-    float lengthDiff = 0;
     int index = 0; // keep track of gesture stroke index of loaded gesture
     static ArrayList<GesturePoint> gp1 = new ArrayList<>();
     GesturePoint p1 = new GesturePoint(220,60, SystemClock.currentThreadTimeMillis());
@@ -68,9 +66,11 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
     Button b, resetButton;
     long start;
+    double dist = 0;
+    float lengthDiff = 0;
+    float timeDiff = 0;
     float end;
     float totalTime;
-    float timeDiff;
     SharedPreferences preferences;
     float templateGestureTime;
     String templateGestureName;
@@ -142,7 +142,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.i("Gesture"," Difference: "+dist);
                 showToast("Length difference: "+lengthDiff);
                 Log.i("Gesture", "Time Difference: "+timeDiff);
-                showToast("Time Difference between Gestures: "+timeDiff);
+                showToast("Time Difference between Gestures: "+timeDiff +" seconds");
                 if(dist<300) {
                     showToast("Gesture detected");
                 }
