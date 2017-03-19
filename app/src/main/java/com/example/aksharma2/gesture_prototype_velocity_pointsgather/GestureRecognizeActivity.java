@@ -141,6 +141,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 showStrokeLength(finalGesture);
                 Log.i("Gesture"," Difference: "+dist);
                 showToast("Length difference: "+lengthDiff);
+                Log.i("Gesture", "Time Difference: "+timeDiff);
+                showToast("Time Difference between Gestures: "+timeDiff);
                 if(dist<300) {
                     showToast("Gesture detected");
                 }
