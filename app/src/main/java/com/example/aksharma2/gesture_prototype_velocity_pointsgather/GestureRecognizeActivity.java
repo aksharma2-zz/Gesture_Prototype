@@ -3,6 +3,7 @@ package com.example.aksharma2.gesture_prototype_velocity_pointsgather;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
@@ -11,6 +12,7 @@ import android.gesture.GesturePoint;
 import android.gesture.GestureStroke;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -66,8 +68,12 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
     Button b, resetButton;
     long start;
-    double end;
-    double velocityDiff;
+    float end;
+    float totalTime;
+    float timeDiff;
+    SharedPreferences preferences;
+    float templateGestureTime;
+    String templateGestureName;
 
 
 
@@ -77,6 +83,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         setContentView(R.layout.test_gesture);
         resetButton = (Button)findViewById(R.id.gesture_test_button);
         openDialog();
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.test_gesture);
         gestures.addOnGestureListener(mGestureListener);
         gestures.addOnGesturePerformedListener(onGesturePerformedListener);
@@ -177,7 +184,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                     return;
                 }
 
-                end = ((System.currentTimeMillis() - start) / 1000.000) ;
+                end = (float)((System.currentTimeMillis() - start) / 1000.000) ;
+                totalTime += (float)end;
                 gesture_length = mCurrentGesture.getLength();
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
@@ -273,7 +281,9 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             //dist = euclidDistance(testGesture);
             dist = calcDiff(finalGesture, testGesture);
             lengthDiff = calcLengthDiff(finalGesture, testGesture);
-            velocityDiff = velocityDifference(finalGesture, testGesture);
+            timeDiff = Math.abs(totalTime - templateGestureTime);
+
+            Log.i(TAG, "Gesture time difference: "+timeDiff);
         }
 
         @Override
@@ -358,6 +368,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         allGesturePoints.clear();
         allGestureStrokes.clear();
         lengthDiff = 0;
+        timeDiff = 0;
+        totalTime = 0;
     }
 
     private void reDrawGestureView() {
@@ -403,6 +415,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 boolean gesture_found = false;
                 String text;
                 text = ed.getText().toString();
+                templateGestureName = text;
 
                 if(text.matches("")){
                     Log.e("Gesture:", " Invalid name");
@@ -410,7 +423,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                     openDialog();
                 }
 
-                gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
+                gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gestures.txt");
                 gLib.load();
 
                 try {
@@ -428,7 +441,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                     showToast("Gesture with name does not exist");
                     openDialog();
                 }
-
+                templateGestureTime = preferences.getFloat(templateGestureName,0);
+                Log.i(TAG, "Template Gesture time: "+ templateGestureTime);
             }
         });
         builder.show();

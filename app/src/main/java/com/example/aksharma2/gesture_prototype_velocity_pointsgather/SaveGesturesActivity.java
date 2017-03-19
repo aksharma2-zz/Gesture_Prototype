@@ -2,6 +2,7 @@ package com.example.aksharma2.gesture_prototype_velocity_pointsgather;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
@@ -11,6 +12,7 @@ import android.gesture.GestureStroke;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -44,16 +46,22 @@ public class SaveGesturesActivity extends AppCompatActivity {
     private ArrayList<GestureStroke>allGestureStrokes = new ArrayList<>(); // all gesture strokes of gesture
     private ArrayList<MyGestureStroke>myGestureStrokes = new ArrayList<>();
     long start;
-    double end;
+    float end;
+    float totalTime;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d("New ","app ");
         super.onCreate(savedInstanceState);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = preferences.edit();
         setContentView(R.layout.save_gesture);
         resetButton = (Button) findViewById(R.id.gesture_reset_button);
         Log.d(TAG, "path = " + Environment.getExternalStorageDirectory().getAbsolutePath());
-        gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
+        gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gestures.txt");
         gLib.load();
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.save_gesture);
         gestures.addOnGestureListener(mGestureListener);
@@ -132,7 +140,8 @@ public class SaveGesturesActivity extends AppCompatActivity {
                     return;
                 }
 
-                end = ((System.currentTimeMillis() - start) / 1000.000) ;
+                end = (float)((System.currentTimeMillis() - start) / 1000.000) ;
+                totalTime += (float)end;
                 gesture_length = mCurrentGesture.getLength();
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
@@ -215,18 +224,17 @@ public class SaveGesturesActivity extends AppCompatActivity {
             Log.i(TAG,"Gesture stroke ended");
             Log.i(TAG,"Gesture Stroke time: "+myGestureStroke.getStroke_velocity());
 
-            /* for(GestureStroke gs: allGestureStrokes){
+             for(GestureStroke gs: allGestureStrokes){
                 finalGesture.addStroke(gs);
-            } */
-
-            for(MyGestureStroke mgs: myGestureStrokes){
-                finalGesture.addStroke(mgs);
             }
+
+
 
             gesture_length = 0;
             Arrays.fill(centroid,0); // make centroid -> 0
             start = 0;
             end = 0;
+            Log.i(TAG,"Total time" +totalTime);
         }
 
         @Override
@@ -300,6 +308,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
                 //db.updateExistingMeasurement(measurement);
                 if (!nameField.getText().toString().matches("")) {
                     mGesturename = nameField.getText().toString();
+                  //  editor.putFloat(mGesturename, totalTime);
                     saveGesture();
                 } else {
                     openDialog("");
@@ -330,12 +339,14 @@ public class SaveGesturesActivity extends AppCompatActivity {
             return;
         }
 
+        editor.putFloat(mGesturename, totalTime);
+        editor.commit();
         gLib.addGesture(mGesturename, finalGesture);
 
         if (!gLib.save()) {
             Log.e(TAG, "gesture not saved!");
         }else {
-            showToast("saved" + getExternalFilesDir(null) + "/gesture.txt");
+            showToast("saved" + getExternalFilesDir(null) + "/gestures.txt");
             Log.i(TAG,"gesture saved!");
         }
         reDrawGestureView();
@@ -348,6 +359,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
         allGesturePoints.clear();
         allGestureStrokes.clear();
         myGestureStrokes.clear();
+        totalTime = 0;
     }
 
     private void reDrawGestureView() {
@@ -371,7 +383,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
 
     private boolean checkExistingName(String name){
 
-        gesture_lib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
+        gesture_lib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gestures.txt");
         gesture_lib.load();
         Set<String> gestureSet = gesture_lib.getGestureEntries();
         for(String gestureName : gestureSet){
