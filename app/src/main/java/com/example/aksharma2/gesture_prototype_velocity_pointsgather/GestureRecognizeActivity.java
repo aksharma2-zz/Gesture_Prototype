@@ -71,9 +71,12 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     float timeDiff = 0;
     float end;
     float totalTime;
+    float gestureCompute = 0;
     SharedPreferences preferences;
     float templateGestureTime;
     String templateGestureName;
+    float[] templatePoints;
+    float[] samplePoints;
 
 
 
@@ -143,6 +146,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 showToast("Length difference: "+lengthDiff);
                 Log.i("Gesture", "Time Difference: "+timeDiff);
                 showToast("Time Difference between Gestures: "+timeDiff +" seconds");
+                showToast("Gesture Score: "+gestureCompute);
+
                 if(dist<300) {
                     showToast("Gesture detected");
                 }
@@ -275,17 +280,25 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             }
 
             Log.i(TAG, "Stroke ended");
-
-            for(MyGestureStroke mgs: myGestureStrokes){
-                finalGesture.addStroke(mgs);
+            for(GestureStroke gs: allGestureStrokes){
+                finalGesture.addStroke(gs);
             }
 
             //dist = euclidDistance(testGesture);
             dist = calcDiff(finalGesture, testGesture);
             lengthDiff = calcLengthDiff(finalGesture, testGesture);
             timeDiff = Math.abs(totalTime - templateGestureTime);
+            gestureCompute = GestureUtility.gestureCompute(testGesture, finalGesture);
+
 
             Log.i(TAG, "Gesture time difference: "+timeDiff);
+            float[] points= testGesture.getStrokes().get(0).points;
+
+            for(int i=0 ;i<points.length; i=i+2){
+                Log.i("point", " x:" +points[i]);
+                Log.i("point", " y:" +points[i+1]);
+            }
+
         }
 
         @Override
@@ -323,6 +336,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             finalGestureStroke = new GestureStroke(allGesturePoints);
             finalGesture = new Gesture();
             finalGesture.addStroke(finalGestureStroke);
+
 
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
@@ -445,6 +459,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 }
                 templateGestureTime = preferences.getFloat(templateGestureName,0);
                 Log.i(TAG, "Template Gesture time: "+ templateGestureTime);
+
+
             }
         });
         builder.show();

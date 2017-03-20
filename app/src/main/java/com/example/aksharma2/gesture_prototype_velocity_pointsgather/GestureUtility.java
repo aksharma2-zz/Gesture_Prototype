@@ -306,6 +306,49 @@ public class GestureUtility {
         return length;
     }
 
+    public static float gestureCompute(Gesture gest1, Gesture gest2){
+
+        float num = 0;
+        float d1 = 0;
+        float d2 = 0;
+        GestureStroke gs1 = gest1.getStrokes().get(0);
+        GestureStroke gs2 = gest2.getStrokes().get(0);
+
+        float[] g1 = gs1.points;
+        float[] g2 = gs2.points;
+
+        for(int i=0; i<g1.length; i++){
+            num += g1[i] * g2[i];
+            d1 += g1[i] * g1[i];
+            d2 += g2[i] * g2[i];
+        }
+
+        d1 = ((float)Math.sqrt(d1));
+        d2 = ((float)Math.sqrt(d2));
+
+        return (num / (d1 * d2));
+
+    }
+
+    public static float CosineDistance(float[] vector1, float[] vector2) {
+        final int len = vector1.length;
+        float dots = 0;
+        float crosses = 0;
+        for (int i = 0; i < len; i += 2) {
+            dots += vector1[i] * vector2[i] + vector1[i + 1] * vector2[i + 1];
+            crosses += vector1[i] * vector2[i + 1] - vector1[i + 1] * vector2[i];
+        }
+        if (dots != 0) {
+            final float tan = crosses/dots;
+            final double angle = Math.atan(tan);
+            final double cosine = Math.cos(angle);
+            final double sine = cosine * tan;
+            return (float) (dots * cosine + crosses * sine); //Norm
+        } else {
+            return (float) -1;
+        }
+    }
+
 
 
 
