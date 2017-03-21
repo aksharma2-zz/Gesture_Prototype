@@ -77,7 +77,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     String templateGestureName;
     float[] templatePoints;
     float[] samplePoints;
-
+    float cosineDistance;
 
 
     @Override
@@ -146,7 +146,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 showToast("Length difference: "+lengthDiff);
                 Log.i("Gesture", "Time Difference: "+timeDiff);
                 showToast("Time Difference between Gestures: "+timeDiff +" seconds");
-                showToast("Gesture Score: "+gestureCompute);
+                Log.i("Gesture", "Cosine Distance: "+cosineDistance);
+                showToast("Gesture Score: "+cosineDistance);
 
                 if(dist<300) {
                     showToast("Gesture detected");
@@ -262,13 +263,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             centroid = GestureUtility.translateCentroid(centroid, gestureView);
 
             finalGestureStroke = new GestureStroke(allGesturePoints);
-            myGestureStroke = new MyGestureStroke(allGesturePoints);
-            myGestureStroke.setStroke_velocity(end);
-
-
             allGestureStrokes.add(finalGestureStroke);
-            myGestureStrokes.add(myGestureStroke);
-
 
             gesture_length = 0;
            // Log.d("translated centroid ", " is " + centroid[0] + " " + centroid[1]);
@@ -288,16 +283,13 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             dist = calcDiff(finalGesture, testGesture);
             lengthDiff = calcLengthDiff(finalGesture, testGesture);
             timeDiff = Math.abs(totalTime - templateGestureTime);
-            gestureCompute = GestureUtility.gestureCompute(testGesture, finalGesture);
+           // gestureCompute = GestureUtility.gestureCompute(testGesture, finalGesture);
 
 
             Log.i(TAG, "Gesture time difference: "+timeDiff);
-            float[] points= testGesture.getStrokes().get(0).points;
+            samplePoints = finalGestureStroke.points;
 
-            for(int i=0 ;i<points.length; i=i+2){
-                Log.i("point", " x:" +points[i]);
-                Log.i("point", " y:" +points[i+1]);
-            }
+            cosineDistance = GestureUtility.cosineDistance(templatePoints, samplePoints);
 
         }
 
@@ -337,6 +329,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             finalGesture = new Gesture();
             finalGesture.addStroke(finalGestureStroke);
 
+            samplePoints = finalGestureStroke.points;
 
             //  translatedPoints=translatePoints(centroid,allGesturePoints);
             gesture_length = 0;
@@ -450,6 +443,12 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                         //   testGesture = gLib.getGestures(text).get(0);
                     }
                     Log.i("Gesture ", "Stroke Count = " + testGesture.getStrokesCount());
+                    templatePoints = testGesture.getStrokes().get(0).points;
+
+                    for(int j=0; j<templatePoints.length; j+=2){
+                        Log.i("Template point x"," "+templatePoints[j]);
+                        Log.i("Template point y"," "+templatePoints[j+1]);
+                    }
 
                 }catch (NullPointerException npe){
 
@@ -459,6 +458,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 }
                 templateGestureTime = preferences.getFloat(templateGestureName,0);
                 Log.i(TAG, "Template Gesture time: "+ templateGestureTime);
+
 
 
             }
