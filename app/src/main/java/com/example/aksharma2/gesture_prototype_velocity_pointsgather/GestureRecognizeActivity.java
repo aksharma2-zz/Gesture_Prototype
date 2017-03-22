@@ -62,6 +62,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     GesturePoint p3 = new GesturePoint(380,60, SystemClock.currentThreadTimeMillis());
     GesturePoint p4 = new GesturePoint(580,60, SystemClock.currentThreadTimeMillis());
     GesturePoint p5 = new GesturePoint(900,60, SystemClock.currentThreadTimeMillis());
+    GesturePoint lastPoint;
 
     Button b, resetButton;
     long start;
@@ -197,6 +198,12 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
                 ArrayList<GestureStroke> strokes = mCurrentGesture.getStrokes();
+                GestureStroke gs_latest = strokes.get(strokes.size()-1);
+                float[] points = gs_latest.points;
+                float lastX = points[points.length-2];
+                float lastY = points[points.length-1];
+                lastPoint = new GesturePoint(lastX, lastY, SystemClock.currentThreadTimeMillis());
+
                 Log.d("First point"," is"+ strokes.get(0).points[0]);
                 mCurrentGesture = new Gesture();
                 allGesturePoints.clear();
@@ -211,6 +218,9 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
                     ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(gps));
                     gp = GestureUtility.resample(gp,8);
+                    if(gp.size() < 8){
+                        gp.add(lastPoint);
+                    }
                     Log.d("spaced point is "," "+gps[0].x);
                     Log.d("spaced point is "," "+gps[1].x);
                     centroid = GestureUtility.computeCentroid(new ArrayList<GesturePoint>(Arrays.asList(gps))); // centroid of gesture
