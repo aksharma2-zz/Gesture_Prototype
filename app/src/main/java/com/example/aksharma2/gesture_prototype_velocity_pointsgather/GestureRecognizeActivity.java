@@ -146,7 +146,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.i("Gesture", "Time Difference: "+timeDiff);
                 showToast("Time Difference between Gestures: "+timeDiff +" seconds");
                 Log.i("Gesture", "Cosine Distance: "+cosineDistance);
-                showToast("Gesture Similarity : "+(cosineDistance * 100)+"%");
+                showToast("Gesture Similarity : "+(100 - (cosineDistance*100))+"%");
 
                 if(cosineDistance<0.3) {
                     showToast("Gesture detected");
@@ -289,6 +289,10 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             samplePoints = finalGestureStroke.points;
 
             cosineDistance = GestureUtility.angleDiff(finalGesture, testGesture);
+
+            if(cosineDistance > 1){
+                cosineDistance = 1;
+            }
 
         }
 

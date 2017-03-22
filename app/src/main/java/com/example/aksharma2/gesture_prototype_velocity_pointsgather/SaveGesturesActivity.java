@@ -50,6 +50,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
     float totalTime;
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
+    GesturePoint lastPoint;
 
 
     @Override
@@ -139,13 +140,18 @@ public class SaveGesturesActivity extends AppCompatActivity {
                     reDrawGestureView();
                     return;
                 }
-
                 end = (float)((System.currentTimeMillis() - start) / 1000.000) ;
                 totalTime += (float)end;
                 gesture_length = mCurrentGesture.getLength();
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
                 ArrayList<GestureStroke> strokes = mCurrentGesture.getStrokes();
+                GestureStroke gs_latest = strokes.get(strokes.size()-1);
+                float[] points = gs_latest.points;
+                float lastX = points[points.length-2];
+                float lastY = points[points.length-1];
+                lastPoint = new GesturePoint(lastX, lastY, SystemClock.currentThreadTimeMillis());
+
                 Log.d("First point"," is"+ strokes.get(0).points[0]);
                 mCurrentGesture = new Gesture();
                 allGesturePoints.clear();
@@ -160,6 +166,9 @@ public class SaveGesturesActivity extends AppCompatActivity {
 
                     ArrayList<GesturePoint> gp = new ArrayList<>(Arrays.asList(gps));
                     gp = GestureUtility.resample(gp,8);
+                    if(gp.size() < 8){
+                        gp.add(lastPoint);
+                    }
                     Log.d("spaced point is "," "+gps[0].x);
                     Log.d("spaced point is "," "+gps[1].x);
                     centroid = GestureUtility.computeCentroid(new ArrayList<GesturePoint>(Arrays.asList(gps))); // centroid of gesture
