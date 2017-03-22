@@ -350,15 +350,24 @@ public class GestureUtility {
         double angle = 0;
 
         for (int i = 0; i < len; i += 2) {
-            a += vector1[i] * vector2[i] + vector1[i + 1] * vector2[i + 1];
-            b += vector1[i] * vector2[i + 1] - vector1[i + 1] * vector2[i];
+            a += (vector1[i] * vector2[i]) + (vector1[i + 1] * vector2[i + 1]);
+            b += (vector1[i] * vector2[i + 1]) - (vector1[i + 1] * vector2[i]);
         }
 
         if (a != 0) {
-            final float tan = b / a;
+            final float tan = b/a;
             angle = Math.atan(tan);
         }
 
-        return (float)Math.acos(a * Math.cos(angle) + b * Math.sin(angle));
+        return (float)Math.acos(a * Math.cos(angle) + b * Math.sin(angle)) ;
     }
+
+    public static double angleDiff(float[] vector1, float[] vector2){
+        double anglediff = 0;
+        for(int i=0; i<vector1.length; i+=2){
+            anglediff += Math.abs(Math.atan2(vector1[i+1], vector1[i]) - Math.atan2(vector2[i+1], vector2[i]));
+        }
+        return anglediff;
+    }
+
 }

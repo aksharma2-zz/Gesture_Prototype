@@ -77,7 +77,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     String templateGestureName;
     float[] templatePoints;
     float[] samplePoints;
-    float cosineDistance;
+    double cosineDistance;
 
 
     @Override
@@ -89,7 +89,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.test_gesture);
         gestures.addOnGestureListener(mGestureListener);
-        gestures.addOnGesturePerformedListener(onGesturePerformedListener);
+      //  gestures.addOnGesturePerformedListener(onGesturePerformedListener);
       //  gestures.addOnGesturePerformedListener(onGesturePerformedListener);
         resetEverything();
         resetButton.setOnClickListener(
@@ -289,7 +289,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             Log.i(TAG, "Gesture time difference: "+timeDiff);
             samplePoints = finalGestureStroke.points;
 
-            cosineDistance = GestureUtility.cosineDistance(templatePoints, samplePoints);
+            cosineDistance = GestureUtility.angleDiff(templatePoints, samplePoints);
 
         }
 
@@ -299,7 +299,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         }
     };
 
-    private GestureOverlayView.OnGesturePerformedListener onGesturePerformedListener = new GestureOverlayView.OnGesturePerformedListener() {
+
+   /* private GestureOverlayView.OnGesturePerformedListener onGesturePerformedListener = new GestureOverlayView.OnGesturePerformedListener() {
         @Override
         public void onGesturePerformed(GestureOverlayView gestureOverlayView, Gesture gesture) {
             gestureOverlayView.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
@@ -317,10 +318,10 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             Log.d("length of gesture ", "is " + gesture_length);
 
             //rotate the gesture points
-          /*  Rectangle r = GestureUtility.BoundingBox(allGesturePoints, new Rectangle());
+            Rectangle r = GestureUtility.BoundingBox(allGesturePoints, new Rectangle());
             allGesturePoints = GestureUtility.RotateToZero(allGesturePoints,centroid, r);
             Log.d("rotated point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
-            Log.d("rotated point is", " "+ allGesturePoints.get(0).y); */
+            Log.d("rotated point is", " "+ allGesturePoints.get(0).y);
 
             //translate centroid to centre -> no need
             centroid = GestureUtility.translateCentroid(centroid, gestureOverlayView);
@@ -338,7 +339,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             Arrays.fill(centroid,0); // make centroid -> 0
             //   Log.d("translated point ", " is x " + translatedPoints.get(0).x + " y " + translatedPoints.get(0).y);
         }
-    };
+    }; */
+
 
 
 
