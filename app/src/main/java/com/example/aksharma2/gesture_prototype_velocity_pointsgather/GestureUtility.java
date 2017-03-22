@@ -370,4 +370,26 @@ public class GestureUtility {
         return anglediff;
     }
 
+    public static double angleDiff(Gesture g1, Gesture g2) {
+        float[] anglediff = {};
+        float avgAngle = 0;
+        int avg = g1.getStrokesCount();
+        ArrayList<GestureStroke> g1_strokes = g1.getStrokes();
+        ArrayList<GestureStroke> g2_strokes = g2.getStrokes();
+
+        for (int i = 0; i < g1_strokes.size(); i++) {
+            float[] g1_points = g1_strokes.get(i).points;
+            float[] g2_points = g2_strokes.get(i).points;
+
+            for (int j = 0; j < g1_points.length; j += 2) {
+                anglediff[i] += Math.abs(Math.atan2(g1_points[j + 1], g1_points[j]) - Math.atan2(g2_points[j + 1], g2_points[j]));
+            }
+        }
+
+        for(int i=0; i<anglediff.length; i++) {
+            avgAngle += anglediff[i];
+        }
+        return avgAngle/avg;
+    }
+
 }
