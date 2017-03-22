@@ -52,7 +52,7 @@ public class SaveGestureActivity extends Activity {
 
 //        openOptionsMenu();
 
-        gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gestures.txt");
+        gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gest.txt");
         gLib.load();
 
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.save_gesture);
@@ -176,7 +176,7 @@ public class SaveGestureActivity extends Activity {
         if (!gLib.save()) {
             Log.e(TAG, "gesture not saved!");
         }else {
-            showToast("saved" + getExternalFilesDir(null) + "/gestures.txt");
+            showToast("saved" + getExternalFilesDir(null) + "/gest.txt");
             Log.i(TAG,"gesture saved!");
         }
         reDrawGestureView();

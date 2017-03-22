@@ -38,6 +38,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
 
     Gesture g1 = new Gesture();
     Gesture testGesture = new Gesture();
+    private Gesture finalGesture;
     Gesture g2 = new Gesture();
     private GestureLibrary gLib;
     boolean gestureExists;
@@ -45,8 +46,6 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     private boolean mGestureDrawn;                      //tc
     private Gesture mCurrentGesture;
     private GestureStroke finalGestureStroke;
-    private MyGestureStroke myGestureStroke;
-    private Gesture finalGesture;
     public float gesture_length;
     private float[] centroid ={};
     static GesturePoint[] points;
@@ -147,9 +146,9 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.i("Gesture", "Time Difference: "+timeDiff);
                 showToast("Time Difference between Gestures: "+timeDiff +" seconds");
                 Log.i("Gesture", "Cosine Distance: "+cosineDistance);
-                showToast("Gesture Score: "+cosineDistance);
+                showToast("Gesture Similarity : "+(cosineDistance * 100)+"%");
 
-                if(dist<300) {
+                if(cosineDistance<0.3) {
                     showToast("Gesture detected");
                 }
                 break;
@@ -289,7 +288,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             Log.i(TAG, "Gesture time difference: "+timeDiff);
             samplePoints = finalGestureStroke.points;
 
-            cosineDistance = GestureUtility.angleDiff(templatePoints, samplePoints);
+            cosineDistance = GestureUtility.angleDiff(finalGesture, testGesture);
 
         }
 
@@ -434,7 +433,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                     openDialog();
                 }
 
-                gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gestures.txt");
+                gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gest.txt");
                 gLib.load();
 
                 try {

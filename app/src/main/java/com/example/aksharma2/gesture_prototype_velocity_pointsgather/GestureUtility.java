@@ -371,9 +371,9 @@ public class GestureUtility {
     }
 
     public static double angleDiff(Gesture g1, Gesture g2) {
-        float[] anglediff = {};
-        float avgAngle = 0;
         int avg = g1.getStrokesCount();
+        float[] anglediff = new float[avg];
+        float avgAngle = 0;
         ArrayList<GestureStroke> g1_strokes = g1.getStrokes();
         ArrayList<GestureStroke> g2_strokes = g2.getStrokes();
 

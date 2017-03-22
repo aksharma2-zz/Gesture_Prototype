@@ -61,7 +61,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
         setContentView(R.layout.save_gesture);
         resetButton = (Button) findViewById(R.id.gesture_reset_button);
         Log.d(TAG, "path = " + Environment.getExternalStorageDirectory().getAbsolutePath());
-        gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gestures.txt");
+        gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gest.txt");
         gLib.load();
         GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.save_gesture);
         gestures.addOnGestureListener(mGestureListener);
@@ -346,7 +346,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
         if (!gLib.save()) {
             Log.e(TAG, "gesture not saved!");
         }else {
-            showToast("saved" + getExternalFilesDir(null) + "/gestures.txt");
+            showToast("saved" + getExternalFilesDir(null) + "/gest.txt");
             Log.i(TAG,"gesture saved!");
         }
         reDrawGestureView();
@@ -383,7 +383,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
 
     private boolean checkExistingName(String name){
 
-        gesture_lib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gestures.txt");
+        gesture_lib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gest.txt");
         gesture_lib.load();
         Set<String> gestureSet = gesture_lib.getGestureEntries();
         for(String gestureName : gestureSet){

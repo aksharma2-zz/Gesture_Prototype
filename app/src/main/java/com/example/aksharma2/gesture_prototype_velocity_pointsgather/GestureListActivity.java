@@ -122,7 +122,7 @@ public class GestureListActivity extends Activity {
     private void makeList() {
         try {
             mGestureList = new ArrayList<GesturePlaceHolder>();
-            gestureLibrary = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gestures.txt");
+            gestureLibrary = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gest.txt");
             gestureLibrary.load();
             Set<String> gestureSet = gestureLibrary.getGestureEntries();
             for(String gestureNaam: gestureSet){
