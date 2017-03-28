@@ -382,7 +382,7 @@ public class GestureUtility {
             float[] g2_points = g2_strokes.get(i).points;
 
             for (int j = 0; j < g1_points.length; j += 2) {
-                anglediff[i] += Math.abs(Math.atan2(g1_points[j + 1], g1_points[j]) - Math.atan2(g2_points[j + 1], g2_points[j]));
+                anglediff[i] += (float)Math.abs(Math.atan2(g1_points[j + 1], g1_points[j]) - Math.atan2(g2_points[j + 1], g2_points[j]));
             }
         }
 

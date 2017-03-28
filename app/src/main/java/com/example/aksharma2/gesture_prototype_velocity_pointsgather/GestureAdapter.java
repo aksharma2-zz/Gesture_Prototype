@@ -34,7 +34,7 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
         this.gestureList = gestureList;
         this.context = ctx;
       //  gestureLibrary = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
-        gestureLibrary = GestureLibraries.fromFile(context.getExternalFilesDir(null) + "/" + "gest.txt");
+        gestureLibrary = GestureLibraries.fromFile(context.getExternalFilesDir(null) + "/" + "gestr.txt");
         gestureLibrary.load();
     }
 

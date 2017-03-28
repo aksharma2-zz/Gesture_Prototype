@@ -78,6 +78,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     float[] templatePoints;
     float[] samplePoints;
     double cosineDistance;
+    double threshold,similarity;
 
 
     @Override
@@ -135,8 +136,13 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.gesture_test:
+                if(testGesture.getStrokesCount() != finalGesture.getStrokesCount()){
+                    cosineDistance=1;
+                    showToast("Gesture Similarity : "+(100 - (cosineDistance*100))+"%");
+                    break;
+                }
+
                 Log.i("Gesture"," Difference: "+dist);
-                showToast("Difference: "+dist);
                 Log.i(" Test Gesture "," Length: "+testGesture.getLength());
                 Log.i("Sample Gesture"," Length: "+finalGesture.getLength());
                 showStrokeLength(testGesture);
@@ -147,11 +153,13 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.i("Gesture", "Time Difference: "+timeDiff);
                 showToast("Time Difference between Gestures: "+timeDiff +" seconds");
                 Log.i("Gesture", "Cosine Distance: "+cosineDistance);
-                showToast("Gesture Similarity : "+(100 - (cosineDistance*100))+"%");
+                similarity = 100-(cosineDistance*100);
+                showToast("Gesture Similarity : "+similarity+"%");
 
-                if(cosineDistance<0.3) {
-                    showToast("Gesture detected");
-                }
+                if(similarity >= threshold) {
+                    showToast(templateGestureName+" detected");
+                } else
+                    showToast("Failed to recognize");
                 break;
 
             case R.id.gesture_remove:
@@ -447,7 +455,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                     openDialog();
                 }
 
-                gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gest.txt");
+                gLib = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gestr.txt");
                 gLib.load();
 
                 try {
@@ -474,8 +482,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 templateGestureTime = preferences.getFloat(templateGestureName,0);
                 Log.i(TAG, "Template Gesture time: "+ templateGestureTime);
 
-
-
+                showStrokeLength(testGesture);
+                setThreshold(testGesture);
             }
         });
         builder.show();
@@ -550,6 +558,30 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             vel_diff += Math.abs(mgs2.get(i).getStroke_velocity() - mgs1.get(i).getStroke_velocity());
         }
         return vel_diff;
+    }
+
+    public void setThreshold(Gesture g){
+        int numStrokes = g.getStrokesCount();
+        switch (numStrokes){
+            case 1:threshold=70;
+                break;
+
+            case 2:threshold=60;
+                break;
+
+            case 3:threshold=50;
+                break;
+
+            case 4:threshold=40;
+                break;
+
+            case 5:threshold=30;
+                break;
+
+            default:threshold=25;
+                break;
+
+        }
     }
 
 }
