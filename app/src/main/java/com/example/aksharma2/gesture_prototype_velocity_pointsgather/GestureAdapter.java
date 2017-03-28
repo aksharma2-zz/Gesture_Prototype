@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 
 /**
  * Created by aksharma2 on 17-02-2017.
@@ -53,6 +54,7 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
             gestureView.gesture_image = (ImageView) convertView.findViewById(R.id.gesture_image);
             gestureView.gestureNameRef = (TextView) convertView.findViewById(R.id.gesture_name_ref);
             gestureView.delButton = (Button)convertView.findViewById(R.id.delete_button);
+            gestureView.showButton = (Button)convertView.findViewById(R.id.show_button);
             convertView.setTag(gestureView);
             gestureView.delButton.setTag(position);
             gestureView.gesture_name.setTag(position);
@@ -65,19 +67,34 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
 
         GesturePlaceHolder gesturePlaceHolder = gestureList.get(position);
         gestureView.gesture_name.setText(gesturePlaceHolder.getGestureName());
+        gestureView.gestureNameRef.setText(gesturePlaceHolder.getGestureName());
         gestureView.gesture_id.setText(Long.toString(gesturePlaceHolder.getGesture().getID()));
-        gestureView.gesture_image.setImageBitmap(gesturePlaceHolder.getGesture().toBitmap(30,30,3, Color.RED));
+        gestureView.gesture_image.setImageBitmap(gesturePlaceHolder.getGesture().toBitmap(50,50,3, Color.RED));
 
 
         gestureView.delButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                LinearLayout parent = (LinearLayout)v.getParent().getParent();
+                TextView tv = (TextView)parent.findViewById(R.id.gesture_name_ref);
+                String s = tv.getText().toString();
+                Log.i("CLick", " "+s);
                 int index = (int)v.getTag();
                 gestureList.remove(index);
+                gestureLibrary.removeEntry(s);
+                gestureLibrary.save();
                 notifyDataSetChanged();
             }
         });
 
+        gestureView.showButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout parent = (LinearLayout)v.getParent().getParent();
+                TextView tv = (TextView)parent.findViewById(R.id.gesture_name_ref);
+                String s = tv.getText().toString();
+            }
+        });
 
         return convertView;
         }

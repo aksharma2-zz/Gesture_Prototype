@@ -17,7 +17,7 @@ public class GestureView extends View{
     public TextView gesture_id;
     public TextView gestureNameRef;
     public Button delButton;
-
+    public Button showButton;
 
 
     public GestureView(Context context) {

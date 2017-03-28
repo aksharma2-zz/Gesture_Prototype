@@ -27,7 +27,7 @@ public class GesturePlaceHolder {
         this.gesture_name = gesture_name;
     }
 
-    public GesturePlaceHolder(Gesture gesture, String gesture_id){
+    public GesturePlaceHolder(Gesture gesture, String gesture_name){
         this.gesture=gesture;
         this.gesture_name = gesture_name;
     }

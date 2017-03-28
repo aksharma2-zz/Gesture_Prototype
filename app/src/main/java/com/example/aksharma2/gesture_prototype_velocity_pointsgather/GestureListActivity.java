@@ -30,7 +30,7 @@ public class GestureListActivity extends Activity {
     private static ArrayList<GesturePlaceHolder> mGestureList;
     private GestureAdapter gestureAdapter;
     private GestureLibrary gestureLibrary;
-    private Button delButton,renameButton, addButton, testButton;
+    private Button delButton,showButton, addButton, testButton;
     //private ImageView mMenuItemView;
 
     @Override
@@ -47,7 +47,10 @@ public class GestureListActivity extends Activity {
         gestureListView.setLongClickable(true);
         gestureListView.setAdapter(gestureAdapter);
         delButton=(Button)findViewById(R.id.delete_button);
-        renameButton=(Button)findViewById(R.id.rename_button);
+        showButton=(Button)findViewById(R.id.show_button);
+
+
+
         gestureListView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
