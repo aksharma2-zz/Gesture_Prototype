@@ -1,9 +1,11 @@
 package com.example.aksharma2.gesture_prototype_velocity_pointsgather;
 
 import android.content.Context;
+import android.content.Intent;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,10 +16,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 
 /**
  * Created by aksharma2 on 17-02-2017.
@@ -69,7 +69,7 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
         gestureView.gesture_name.setText(gesturePlaceHolder.getGestureName());
         gestureView.gestureNameRef.setText(gesturePlaceHolder.getGestureName());
         gestureView.gesture_id.setText(Long.toString(gesturePlaceHolder.getGesture().getID()));
-        gestureView.gesture_image.setImageBitmap(gesturePlaceHolder.getGesture().toBitmap(50,50,3, Color.RED));
+        gestureView.gesture_image.setImageBitmap(gesturePlaceHolder.getGesture().toBitmap(30,30,3, Color.RED));
 
 
         gestureView.delButton.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +92,12 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
             public void onClick(View v) {
                 LinearLayout parent = (LinearLayout)v.getParent().getParent();
                 TextView tv = (TextView)parent.findViewById(R.id.gesture_name_ref);
-                String s = tv.getText().toString();
+                String gesture_name = tv.getText().toString();
+                Intent i = new Intent(context, ShowGestureActivity.class);
+                Bundle b = new Bundle();
+                b.putString("gesture_name", gesture_name);
+                i.putExtras(b);
+                context.startActivity(i);
             }
         });
 

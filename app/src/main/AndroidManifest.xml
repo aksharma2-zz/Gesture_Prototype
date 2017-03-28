@@ -19,6 +19,7 @@
         <activity android:name=".SaveGesturesActivity" />
         <activity android:name=".GestureRecognizeActivity" />
         <activity android:name=".SaveGestureActivity" />
+        <activity android:name=".ShowGestureActivity" />
     </application>
 
 </manifest>

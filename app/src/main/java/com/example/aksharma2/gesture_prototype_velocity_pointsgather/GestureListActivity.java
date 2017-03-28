@@ -50,7 +50,6 @@ public class GestureListActivity extends Activity {
         showButton=(Button)findViewById(R.id.show_button);
 
 
-
         gestureListView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -109,6 +108,9 @@ public class GestureListActivity extends Activity {
 
             }
         });
+
+
+
         // displays the popup context top_menu to either delete or resend measurement
         // registerForContextMenu(gestureListView);
 

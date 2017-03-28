@@ -3,10 +3,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/parentlayout"
     android:orientation="horizontal"
-    android:layout_width="fill_parent"
+    android:layout_width="30dp"
     android:layout_height="60dp"
     android:padding="1dp"
-    android:descendantFocusability="blocksDescendants">
+    >
     <ImageView
         android:id="@+id/gesture_image"
         android:layout_width="70dp"
@@ -21,7 +21,8 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
         <TextView
             android:id="@+id/gesture_name"
@@ -71,15 +72,7 @@
             android:layout_height="wrap_content"
             android:text="Show"
             android:id="@+id/show_button"
-            android:layout_weight="0.60" />
-
-        <ImageView
-            android:id="@+id/menu_item_options"
-            android:layout_width="wrap_content"
-            android:layout_height="46dp"
-            android:src="@android:drawable/ic_menu_more"
-            android:paddingRight="12dp"
-            android:onClick="populateMenu" />
+            android:layout_weight="0.15" />
 
     </LinearLayout>
 </LinearLayout>

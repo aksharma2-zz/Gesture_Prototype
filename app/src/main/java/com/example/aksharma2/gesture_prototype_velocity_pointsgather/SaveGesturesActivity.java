@@ -91,26 +91,11 @@ public class SaveGesturesActivity extends AppCompatActivity {
                 reDrawGestureView();
                 break;
             case R.id.Save:
+                for(GestureStroke gs: allGestureStrokes){
+                    finalGesture.addStroke(gs);
+                }
                openDialog("");
-                break;
-
-            //TODO : Save gesture as image, dont delete this code
-                /*
-                String pattern = "mm ss";
-                SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-                String time = formatter.format(new Date());
-                String path = ("/d-codepages" + time + ".png");
-                File file = new File(Environment.getExternalStorageDirectory()
-                        + path);
-                try {
-                    //DrawBitmap.compress(Bitmap.CompressFormat.PNG, 100,
-                    //new FileOutputStream(file));
-                    Toast.makeText(this, "File Saved ::" + path, Toast.LENGTH_SHORT)
-                            .show();
-                } catch (Exception e) {
-                    Toast.makeText(this, "ERROR" + e.toString(), Toast.LENGTH_SHORT)
-                            .show();
-                }   */
+               break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -121,7 +106,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
             overlay.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
             gestureExists = true;
             Log.d(TAG, "New Gesture Stroke");
-            allGesturePoints.clear(); // remove all existing gesture points
+            allGesturePoints=new ArrayList<>(); // remove all existing gesture points
             finalGesture = new Gesture();
             start = System.currentTimeMillis();
         }
@@ -233,9 +218,9 @@ public class SaveGesturesActivity extends AppCompatActivity {
             Log.i(TAG,"Gesture stroke ended");
             Log.i(TAG,"Gesture Stroke time: "+myGestureStroke.getStroke_velocity());
 
-             for(GestureStroke gs: allGestureStrokes){
-                finalGesture.addStroke(gs);
-            }
+             //for(GestureStroke gs: allGestureStrokes){
+               // finalGesture.addStroke(gs);
+            //}
 
 
 
