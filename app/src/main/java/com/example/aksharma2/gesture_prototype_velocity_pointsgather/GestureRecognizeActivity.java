@@ -156,7 +156,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 showToast("Time Difference between Gestures: "+timeDiff +" seconds");
                 Log.i("Gesture", "Cosine Distance: "+cosineDistance);
                 showToast("Gesture Speed Similarity: "+(100-speedDiff)+"%");
-                similarity = 100-(cosineDistance*100);
+                showToast("Gesture Angular Similarity: "+(100-(cosineDistance*100))+"%");
+                similarity = 100-((0.35*speedDiff)+(0.65*cosineDistance*100));
                 showToast("Gesture Similarity : "+similarity+"%");
 
                 if(similarity >= threshold) {
