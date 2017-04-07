@@ -9,11 +9,14 @@ import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
 import android.gesture.GesturePoint;
 import android.gesture.GestureStroke;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,10 +26,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
+
+import static android.R.attr.bitmap;
 
 
 public class SaveGesturesActivity extends AppCompatActivity {
@@ -52,6 +58,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
     GesturePoint lastPoint;
     float gesture_speed;
+    String gesture_image;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,7 +127,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
         public void onGestureEnded(final GestureOverlayView gestureView, MotionEvent motion) {
             try {
 
-                if(!GestureUtility.strokeLengthThreshold(gestureView, gestureView.getGesture(), 200)){
+                if(!GestureUtility.strokeLengthThreshold(gestureView, gestureView.getGesture(), 120)){
                     showToast("Gesture stroke is too small. Please try again");
                     reDrawGestureView();
                     return;
@@ -220,6 +227,12 @@ public class SaveGesturesActivity extends AppCompatActivity {
             end = 0;
             Log.i(TAG,"Total time" +totalTime);
             Log.i(TAG,"Gesture Speed "+gesture_speed);
+            Bitmap bitmap = gestureView.getGesture().toBitmap(30,30,3, Color.RED);
+            ByteArrayOutputStream baos=new  ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+            byte [] b=baos.toByteArray();
+            gesture_image= Base64.encodeToString(b, Base64.DEFAULT);
+
         }
 
         @Override
@@ -320,6 +333,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
 
         editor.putFloat(mGesturename, totalTime);
         editor.putFloat(mGesturename+"speed",gesture_speed);
+        editor.putString(mGesturename+"img",gesture_image);
         editor.commit();
         gLib.addGesture(mGesturename, finalGesture);
 

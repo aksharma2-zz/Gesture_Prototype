@@ -2,11 +2,16 @@ package com.example.aksharma2.gesture_prototype_velocity_pointsgather;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +34,7 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
     private Context context;
     private GestureLibrary gestureLibrary;
     View.OnClickListener onClickListener;
+    SharedPreferences preferences;
 
     public GestureAdapter(ArrayList<GesturePlaceHolder> gestureList, Context ctx){
         super(ctx, R.layout.gestures_list, gestureList);
@@ -37,6 +43,7 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
       //  gestureLibrary = GestureLibraries.fromFile(getExternalFilesDir(null) + "/" + "gesture.txt");
         gestureLibrary = GestureLibraries.fromFile(context.getExternalFilesDir(null) + "/" + "gestr.txt");
         gestureLibrary.load();
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @NonNull
@@ -69,7 +76,13 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
         gestureView.gesture_name.setText(gesturePlaceHolder.getGestureName());
         gestureView.gestureNameRef.setText(gesturePlaceHolder.getGestureName());
         gestureView.gesture_id.setText(Long.toString(gesturePlaceHolder.getGesture().getID()));
-        gestureView.gesture_image.setImageBitmap(gesturePlaceHolder.getGesture().toBitmap(30,30,3, Color.RED));
+
+        String gesture_img = preferences.getString(gesturePlaceHolder.getGestureName()+"img","null");
+        byte [] encodeByte= Base64.decode(gesture_img,Base64.DEFAULT);
+        Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+
+        gestureView.gesture_image.setImageBitmap(bitmap);
+                //gesturePlaceHolder.getGesture().toBitmap(30,30,3, Color.RED));
 
 
         gestureView.delButton.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +91,7 @@ public class GestureAdapter extends ArrayAdapter<GesturePlaceHolder> {
                 LinearLayout parent = (LinearLayout)v.getParent().getParent();
                 TextView tv = (TextView)parent.findViewById(R.id.gesture_name_ref);
                 String s = tv.getText().toString();
-                Log.i("CLick", " "+s);
+                Log.i("Click", " "+s);
                 int index = (int)v.getTag();
                 gestureList.remove(index);
                 gestureLibrary.removeEntry(s);

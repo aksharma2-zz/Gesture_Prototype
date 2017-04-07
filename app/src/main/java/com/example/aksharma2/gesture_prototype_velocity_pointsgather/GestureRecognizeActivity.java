@@ -198,7 +198,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             Log.d(TAG, "PersonalGesture stroke ended");
             try {
 
-                if(!GestureUtility.strokeLengthThreshold(gestureView, gestureView.getGesture(), 150)){
+                if(!GestureUtility.strokeLengthThreshold(gestureView, gestureView.getGesture(), 120)){
                     showToast("Gesture stroke is too small. Please try again");
                     reDrawGestureView();
                     return;
