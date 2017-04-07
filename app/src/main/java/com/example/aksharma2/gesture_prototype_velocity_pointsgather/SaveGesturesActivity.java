@@ -51,7 +51,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
     GesturePoint lastPoint;
-
+    float gesture_speed;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,7 +120,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
         public void onGestureEnded(final GestureOverlayView gestureView, MotionEvent motion) {
             try {
 
-                if(!GestureUtility.strokeLengthThreshold(gestureView, gestureView.getGesture(), 150)){
+                if(!GestureUtility.strokeLengthThreshold(gestureView, gestureView.getGesture(), 200)){
                     showToast("Gesture stroke is too small. Please try again");
                     reDrawGestureView();
                     return;
@@ -128,6 +128,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
                 end = (float)((System.currentTimeMillis() - start) / 1000.000) ;
                 totalTime += (float)end;
                 gesture_length = mCurrentGesture.getLength();
+                gesture_speed = gesture_length/totalTime;
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
                 ArrayList<GestureStroke> strokes = mCurrentGesture.getStrokes();
@@ -210,25 +211,15 @@ public class SaveGesturesActivity extends AppCompatActivity {
             allGestureStrokes.add(finalGestureStroke);
             myGestureStrokes.add(myGestureStroke);
 
-            // finalGesture = new Gesture();
-           // finalGesture.addStroke(finalGestureStroke);
-
-            //  translatedPoints=translatePoints(centroid,allGesturePoints);
-
             Log.i(TAG,"Gesture stroke ended");
             Log.i(TAG,"Gesture Stroke time: "+myGestureStroke.getStroke_velocity());
-
-             //for(GestureStroke gs: allGestureStrokes){
-               // finalGesture.addStroke(gs);
-            //}
-
-
 
             gesture_length = 0;
             Arrays.fill(centroid,0); // make centroid -> 0
             start = 0;
             end = 0;
             Log.i(TAG,"Total time" +totalTime);
+            Log.i(TAG,"Gesture Speed "+gesture_speed);
         }
 
         @Override
@@ -253,12 +244,6 @@ public class SaveGesturesActivity extends AppCompatActivity {
             }
 
             Log.d("length of gesture ", "is " + gesture_length);
-
-            //rotate the gesture points
-          /*  Rectangle r = GestureUtility.BoundingBox(allGesturePoints, new Rectangle());
-            allGesturePoints = GestureUtility.RotateToZero(allGesturePoints,centroid, r);
-            Log.d("rotated point is", " "+ allGesturePoints.get(0).x); // translated gesture point x
-            Log.d("rotated point is", " "+ allGesturePoints.get(0).y); */
 
             //translate centroid to centre -> no need
             centroid = GestureUtility.translateCentroid(centroid, gestureOverlayView);
@@ -334,6 +319,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
         }
 
         editor.putFloat(mGesturename, totalTime);
+        editor.putFloat(mGesturename+"speed",gesture_speed);
         editor.commit();
         gLib.addGesture(mGesturename, finalGesture);
 

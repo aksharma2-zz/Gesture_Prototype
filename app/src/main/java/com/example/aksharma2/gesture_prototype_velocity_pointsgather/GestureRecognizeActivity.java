@@ -69,11 +69,13 @@ public class GestureRecognizeActivity extends AppCompatActivity {
     double dist = 0;
     float lengthDiff = 0;
     float timeDiff = 0;
+    float speedDiff = 0;
     float end;
     float totalTime;
     float gestureCompute = 0;
     SharedPreferences preferences;
     float templateGestureTime;
+    float templateGestureSpeed, sampleGestureSpeed;
     String templateGestureName;
     float[] templatePoints;
     float[] samplePoints;
@@ -153,6 +155,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.i("Gesture", "Time Difference: "+timeDiff);
                 showToast("Time Difference between Gestures: "+timeDiff +" seconds");
                 Log.i("Gesture", "Cosine Distance: "+cosineDistance);
+                showToast("Gesture Speed Similarity: "+(100-speedDiff)+"%");
                 similarity = 100-(cosineDistance*100);
                 showToast("Gesture Similarity : "+similarity+"%");
 
@@ -203,6 +206,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 end = (float)((System.currentTimeMillis() - start) / 1000.000) ;
                 totalTime += (float)end;
                 gesture_length = mCurrentGesture.getLength();
+                sampleGestureSpeed = gesture_length/totalTime;
                 Log.d("Total stroke length ", "is " + mCurrentGesture.getLength());
                 Log.d("stroke count is ", "" + mCurrentGesture.getStrokesCount());
                 ArrayList<GestureStroke> strokes = mCurrentGesture.getStrokes();
@@ -300,6 +304,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             dist = calcDiff(finalGesture, testGesture);
             lengthDiff = calcLengthDiff(finalGesture, testGesture);
             timeDiff = Math.abs(totalTime - templateGestureTime);
+            speedDiff = Math.abs((templateGestureSpeed - sampleGestureSpeed)/templateGestureSpeed) *100;
+
            // gestureCompute = GestureUtility.gestureCompute(testGesture, finalGesture);
 
 
@@ -311,6 +317,8 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             if(cosineDistance > 1){
                 cosineDistance = 1;
             }
+
+            Log.i(TAG, "Gesture speed: "+sampleGestureSpeed);
 
         }
 
@@ -369,28 +377,6 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         return Math.sqrt(Math.pow(pt2.x - pt1.x,2) + Math.pow(pt2.y - pt1.y,2));
     }
 
-    /*public static double euclidDistance(Gesture testGesture){
-        double diff=0;
-        double diff1=0;
-        double diff2=0;
-        GestureStroke gs = testGesture.getStrokes().get(0);
-        points = GestureUtility.floatToGP(gs.points);
-
-        for(int i=0;i<points.length;i++){
-            Log.i("Loaded points ","x "+points[i].x + " y "+points[i].y);
-        }
-      //  GestureStroke gs1 = g1.getStrokes().get(0);
-       // GestureStroke gs2 = g2.getStrokes().get(0);
-
-        for(int i=0;i<7;i++){
-            diff1 = euclidDistance(points[i], allGesturePoints.get(i));
-            //diff2 = euclidDistance(gps[i],x);
-            diff += Math.abs(diff1); // diff += Math.abs(diff2 - diff1);
-        }
-        return diff;
-    } */
-
-
 
     private void resetEverything(){
         mGestureDrawn = false;
@@ -401,6 +387,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         allGestureStrokes.clear();
         lengthDiff = 0;
         timeDiff = 0;
+        speedDiff = 0;
         totalTime = 0;
     }
 
@@ -480,6 +467,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                     openDialog();
                 }
                 templateGestureTime = preferences.getFloat(templateGestureName,0);
+                templateGestureSpeed = preferences.getFloat(templateGestureName+"speed",0);
                 Log.i(TAG, "Template Gesture time: "+ templateGestureTime);
 
                 showStrokeLength(testGesture);
