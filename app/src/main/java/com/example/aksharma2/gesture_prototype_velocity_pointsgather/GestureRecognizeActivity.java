@@ -111,10 +111,10 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         GestureStroke gs1 = new GestureStroke(gp1);
 
         g1.addStroke(gs1);
-        b = (Button)findViewById(R.id.gesture_value_button);
+     //   b = (Button)findViewById(R.id.gesture_value_button);
 
 
-        b.setOnClickListener(new View.OnClickListener() {
+/*        b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("Length is", ":" +dist);
@@ -122,7 +122,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 //Toast.makeText(GestureRecognizeActivity.this, ""+dist, Toast.LENGTH_SHORT).show();
 
             }
-        });
+        }); */
 
 
 
@@ -151,13 +151,13 @@ public class GestureRecognizeActivity extends AppCompatActivity {
                 Log.i("Sample","Gesture");
                 showStrokeLength(finalGesture);
                 Log.i("Gesture"," Difference: "+dist);
-                showToast("Length difference: "+lengthDiff);
+              //  showToast("Length difference: "+lengthDiff);
                 Log.i("Gesture", "Time Difference: "+timeDiff);
-                showToast("Time Difference between Gestures: "+timeDiff +" seconds");
+              //  showToast("Time Difference between Gestures: "+timeDiff +" seconds");
                 Log.i("Gesture", "Cosine Distance: "+cosineDistance);
                 showToast("Gesture Speed Similarity: "+(100-speedDiff)+"%");
                 showToast("Gesture Angular Similarity: "+(100-(cosineDistance*100))+"%");
-                similarity = 100-((0.35*speedDiff)+(0.65*cosineDistance*100));
+                similarity = 100-((0.28*speedDiff)+(0.72*cosineDistance*100));
                 showToast("Gesture Similarity : "+similarity+"%");
 
                 if(similarity >= threshold) {
@@ -302,18 +302,25 @@ public class GestureRecognizeActivity extends AppCompatActivity {
             }
 
             //dist = euclidDistance(testGesture);
-            dist = calcDiff(finalGesture, testGesture);
-            lengthDiff = calcLengthDiff(finalGesture, testGesture);
-            timeDiff = Math.abs(totalTime - templateGestureTime);
-            speedDiff = Math.abs((templateGestureSpeed - sampleGestureSpeed)/templateGestureSpeed) *100;
+            try {
+                dist = calcDiff(finalGesture, testGesture);
+                lengthDiff = calcLengthDiff(finalGesture, testGesture);
+                timeDiff = Math.abs(totalTime - templateGestureTime);
+                speedDiff = Math.abs((templateGestureSpeed - sampleGestureSpeed) / templateGestureSpeed) * 100;
 
-           // gestureCompute = GestureUtility.gestureCompute(testGesture, finalGesture);
+                // gestureCompute = GestureUtility.gestureCompute(testGesture, finalGesture);
 
+                Log.i(TAG, "Gesture time difference: "+timeDiff);
+                samplePoints = finalGestureStroke.points;
+                cosineDistance = GestureUtility.angleDiff(finalGesture, testGesture);
 
-            Log.i(TAG, "Gesture time difference: "+timeDiff);
-            samplePoints = finalGestureStroke.points;
-
-            cosineDistance = GestureUtility.angleDiff(finalGesture, testGesture);
+            }catch(IndexOutOfBoundsException ioe){
+                dist=Double.MAX_VALUE;
+                lengthDiff = Float.MAX_VALUE;
+                timeDiff=100;
+                speedDiff=100;
+                cosineDistance=2;
+            }
 
             if(cosineDistance > 1){
                 cosineDistance = 1;
@@ -396,7 +403,7 @@ public class GestureRecognizeActivity extends AppCompatActivity {
         dist=0;
         Log.i("Action", "RESET GESTURE");
         setContentView(R.layout.test_gesture);
-        resetButton = (Button) findViewById(R.id.gesture_test_button);
+     //   resetButton = (Button) findViewById(R.id.gesture_test_button);
         resetButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override

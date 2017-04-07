@@ -345,7 +345,7 @@ public class SaveGesturesActivity extends AppCompatActivity {
     private void reDrawGestureView() {
         Log.i("RESET", " GESTURE");
         setContentView(R.layout.save_gesture);
-        resetButton = (Button) findViewById(R.id.gesture_reset_button);
+       // resetButton = (Button) findViewById(R.id.gesture_reset_button);
         resetButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
